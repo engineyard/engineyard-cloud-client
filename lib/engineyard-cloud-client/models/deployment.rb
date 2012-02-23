@@ -3,7 +3,7 @@ require 'engineyard-cloud-client/errors'
 
 module EY
   class CloudClient
-    class Deployment < ApiStruct.new(:id, :app_environment, :created_at, :commit, :finished_at, :migrate_command, :output, :ref, :resolved_ref, :successful, :user_name, :extra_config)
+    class Deployment < ApiStruct.new(:id, :app_environment, :created_at, :commit, :finished_at, :migrate_command, :ref, :resolved_ref, :successful, :user_name, :extra_config)
       def self.api_root(app_id, environment_id)
         "/apps/#{app_id}/environments/#{environment_id}/deployments"
       end
@@ -54,18 +54,24 @@ module EY
         post_to_api({
           :migrate         => migrate,
           :migrate_command => migrate_command,
-          :output          => output,
           :ref             => ref,
         })
       end
 
-      def append_output(out)
-        @output ||= ''
-        @output << out
+      def output
+        @output ||= StringIO.new
+      end
+
+      def out
+        output
+      end
+
+      def err
+        output
       end
 
       def finished
-        put_to_api({:successful => successful, :output => output})
+        put_to_api({:successful => successful, :output => output.rewind.read})
       end
 
       def finished?
