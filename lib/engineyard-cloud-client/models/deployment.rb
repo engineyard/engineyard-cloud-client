@@ -71,7 +71,8 @@ module EY
       end
 
       def finished
-        put_to_api({:successful => successful, :output => output.rewind.read})
+        output.rewind
+        put_to_api({:successful => successful, :output => output.read})
       end
 
       def finished?
