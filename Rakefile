@@ -48,25 +48,6 @@ def release_changelog(version)
   clog.open('w') { |f| f.puts new_clog }
 end
 
-def bump_serverside_adapter
-  specs = Gem::SpecFetcher.fetcher.fetch(Gem::Dependency.new("engineyard-serverside-adapter"))
-  versions = specs.map {|spec,| spec.version}.sort
-  latest_adapter_version = versions.last.to_s
-
-  File.open('engineyard-cloud-client.gemspec', 'r') do |read_gemfile|
-    File.unlink('engineyard-cloud-client.gemspec')
-    File.open('engineyard-cloud-client.gemspec', 'w') do |write_gemfile|
-      read_gemfile.each_line do |line|
-        if line =~ /s.add_dependency\('engineyard-serverside-adapter',/
-          write_gemfile.write("  s.add_dependency(\'engineyard-serverside-adapter\', \'=#{latest_adapter_version}\')   # This line maintained by rake; edits may be stomped on\n")
-        else
-          write_gemfile.write(line)
-        end
-      end
-    end
-  end
-end
-
 desc "Bump version of this gem"
 task :bump do
   ver = bump
@@ -75,18 +56,12 @@ end
 
 def run_commands(*cmds)
   cmds.flatten.each do |c|
-    system(c) or raise "Command "#{c}" failed to execute; aborting!"
+    system(c) or raise "Command #{c.inspect} failed to execute; aborting!"
   end
 end
 
 desc "Release gem"
-task :release do
-  # Make sure we work with the latest version of serverside(-adapter)
-  bump_serverside_adapter
-  run_commands(
-    "bundle install",
-    "rake spec") # can't invoke directly; new gems won't get picked up
-
+task :release => :spec do
   new_version = bump
   release_changelog(new_version)
 
