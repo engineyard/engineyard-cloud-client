@@ -35,7 +35,7 @@ module EY
       end
 
       def migrate
-        !!migrate_command
+        !migrate_command.nil? && !migrate_command.to_s.empty?
       end
       alias migrate? migrate
       alias migration_command migrate_command
@@ -51,11 +51,9 @@ module EY
       end
 
       def start
-        post_to_api({
-          :migrate         => migrate,
-          :migrate_command => migrate_command,
-          :ref             => ref,
-        })
+        params = { :migrate => migrate, :ref => ref }
+        params[:migrate_command] = migrate_command if migrate
+        post_to_api(params)
       end
 
       def output
