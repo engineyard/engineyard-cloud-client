@@ -30,8 +30,8 @@ module EY
     end
 
     class BadAppMasterStatusError < Error
-      def initialize(master_status)
-        super "Application master's status is not \"running\" (green); it is \"#{master_status}\"."
+      def initialize(master_status, endpoint)
+        super %|Application master's status is not "running" (green); it is "#{master_status}". Go to #{endpoint} to address this problem.|
       end
     end
   end

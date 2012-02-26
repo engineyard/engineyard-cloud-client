@@ -124,7 +124,7 @@ module EY
         if master.nil?
           raise NoAppMasterError.new(name)
         elsif !ignore_bad_master && master.status != "running"
-          raise BadAppMasterStatusError.new(master.status)
+          raise BadAppMasterStatusError.new(master.status, EY::CloudClient.endpoint)
         end
         master
       end
