@@ -1,2 +1,7 @@
 = engineyard-cloud-client
 
+The API client for awsm. Extracted from the engineyard gem because this piece is often all a project needs for EY Cloud API usage.
+
+See engineyard gem for a usage example. Bother someone if this is released and the documentation is still not updated.
+
+This is currently unreleased.
