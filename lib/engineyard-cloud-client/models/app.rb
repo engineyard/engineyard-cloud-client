@@ -7,10 +7,6 @@ module EY
 
       attr_reader :app_environments, :account
 
-      def initialize(api, attrs)
-        super
-      end
-
       # Return list of all Apps linked to all current user's accounts
       def self.all(api)
         self.from_array(api, api.request('/apps')["apps"])

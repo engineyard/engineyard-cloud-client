@@ -9,10 +9,6 @@ module EY
                                      )
       attr_accessor :ignore_bad_master, :apps, :account, :instances, :app_master
 
-      def initialize(api, attrs)
-        super
-      end
-
       def attributes=(attrs)
         account_attrs    = attrs.delete('account')
         apps_attrs       = attrs.delete('apps')
