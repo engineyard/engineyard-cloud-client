@@ -39,13 +39,9 @@ RSpec.configure do |config|
 
   config.include SpecHelpers
 
-  config.extend SpecHelpers::Given
-  config.extend SpecHelpers::Fixtures
-
   config.before(:all) do
     FakeWeb.allow_net_connect = false
     ENV["CLOUD_URL"] = nil
-    ENV["NO_SSH"] = "true"
   end
 
   config.before(:each) do
