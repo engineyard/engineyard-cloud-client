@@ -2,19 +2,21 @@ require 'spec_helper'
 
 describe EY::CloudClient do
   describe "endpoint" do
+    after do
+      EY::CloudClient.default_endpoint!
+    end
+
     it "defaults to production EY Cloud" do
       EY::CloudClient.endpoint.should == URI.parse('https://cloud.engineyard.com')
     end
 
-    it "loads saves a valid endpoint" do
+    it "loads and saves a valid endpoint" do
       EY::CloudClient.endpoint = "http://fake.local/"
       EY::CloudClient.endpoint.should == URI.parse('http://fake.local')
-      EY::CloudClient.default_endpoint!
     end
 
     it "raises on an invalid endpoint" do
       lambda { EY::CloudClient.endpoint = "non/absolute" }.should raise_error(EY::CloudClient::BadEndpointError)
-      EY::CloudClient.default_endpoint!
     end
   end
 
