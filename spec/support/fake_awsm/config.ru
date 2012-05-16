@@ -1,28 +1,34 @@
 require 'rubygems'
 require 'sinatra/base'
 require 'json'
-require 'hashie'
+require 'rabl'
 require 'gitable'
 require 'ey_resolver'
 require File.expand_path('../scenarios', __FILE__)
 require File.expand_path('../models', __FILE__)
 
+Rabl.register!
+Rabl.configure do |config|
+  config.include_json_root = false
+end
+
 class FakeAwsm < Sinatra::Base
   disable :show_exceptions
   enable :raise_errors
+  set :views, File.expand_path('../views', __FILE__)
 
-  SCENARIOS = {
-    "empty"                                               => Scenario::Base.new,
-    "one app, one environment, not linked"                => Scenario::UnlinkedApp.new,
-    "two apps"                                            => Scenario::TwoApps.new,
-    "one app, one environment"                            => Scenario::LinkedApp.new,
-    "two accounts, two apps, two environments, ambiguous" => Scenario::MultipleAmbiguousAccounts.new,
-    "one app, one environment, no instances"              => Scenario::LinkedAppNotRunning.new,
-    "one app, one environment, app master red"            => Scenario::LinkedAppRedMaster.new,
-    "one app, many environments"                          => Scenario::OneAppManyEnvs.new,
-    "one app, many similarly-named environments"          => Scenario::OneAppManySimilarlyNamedEnvs.new,
-    "two apps, same git uri"                              => Scenario::TwoAppsSameGitUri.new,
-  }
+  SCENARIOS = [
+    Scenario::Base.new,
+    Scenario::UnlinkedApp.new,
+    Scenario::TwoApps.new,
+    Scenario::LinkedApp.new,
+    Scenario::MultipleAmbiguousAccounts.new,
+    Scenario::LinkedAppNotRunning.new,
+    Scenario::LinkedAppRedMaster.new,
+    Scenario::OneAppManyEnvs.new,
+    Scenario::OneAppManySimilarlyNamedEnvs.new,
+    Scenario::TwoAppsSameGitUri.new,
+  ]
 
   def initialize(*_)
     super
@@ -47,7 +53,7 @@ class FakeAwsm < Sinatra::Base
   end
 
   get "/scenario" do
-    new_scenario = SCENARIOS[params[:scenario]]
+    new_scenario = SCENARIOS.detect { |scen| scen.user.name == params[:scenario] }
     unless new_scenario
       status(404)
       return {"ok" => "false", "message" => "wtf is the #{params[:scenario]} scenario?"}.to_json
@@ -66,67 +72,30 @@ class FakeAwsm < Sinatra::Base
     { "user" => @user.to_api_response }.to_json
   end
 
+  get "/api/v2/accounts" do
+    @accounts = @user.accounts
+    render :rabl, :accounts, :format => "json"
+  end
+
   get "/api/v2/apps" do
     raise('No user agent header') unless env['HTTP_USER_AGENT'] =~ %r#^EngineYardCloudClient/#
-    apps = @user.accounts.apps.map { |app| app.to_api_response }
-    {"apps" => apps}.to_json
+    @apps = @user.accounts.apps
+    render :rabl, :apps, :format => "json"
   end
 
   get "/api/v2/environments" do
-    environments = @user.accounts.environments.map { |env| env.to_api_response }
-    {"environments" => environments}.to_json
+    @environments = @user.accounts.environments
+    render :rabl, :environments, :format => "json"
   end
 
   get "/api/v2/environments/resolve" do
-    resolver = EY::Resolver.environment_resolver(@user, params['constraints'])
-    envs = resolver.matches
-    if envs.any?
-      {
-        'environments' => envs.map {|env| env.to_api_response},
-        'errors' => [],
-        'suggestions' => {}
-      }.to_json
-    else
-      errors = resolver.errors
-      if resolver.suggestions
-        api_suggest = resolver.suggestions.inject({}) do |suggest, k,v|
-          suggest.merge(k => v.map { |obj| obj.to_api_response })
-        end
-      end
-      {
-        'environments' => [],
-        'errors'       => errors,
-        'suggestions'  => api_suggest,
-      }.to_json
-    end
+    @resolver = EY::Resolver.environment_resolver(@user, params['constraints'])
+    render :rabl, :resolve_environments, :format => "json"
   end
 
   get "/api/v2/app_environments/resolve" do
-    resolver = EY::Resolver.app_env_resolver(@user, params['constraints'])
-    app_envs = resolver.matches
-    if app_envs.any?
-      {
-        'app_environments' => app_envs.map {|app_env| app_env.to_api_response},
-        'errors' => [],
-        'suggestions' => {}
-      }.to_json
-    else
-      errors = resolver.errors
-      if resolver.suggestions
-        api_suggest = resolver.suggestions.inject({}) do |suggest, k,v|
-          if v
-            suggest.merge(k => v.map { |obj| obj.to_api_response })
-          else
-            suggest
-          end
-        end
-      end
-      {
-        'app_environments' => [],
-        'errors'           => errors,
-        'suggestions'      => api_suggest,
-      }.to_json
-    end
+    @resolver = EY::Resolver.app_env_resolver(@user, params['constraints'])
+    render :rabl, :resolve_app_environments, :format => "json"
   end
 
   get "/api/v2/environments/:env_id/logs" do

@@ -3,6 +3,11 @@ require 'engineyard-cloud-client/models/api_struct'
 module EY
   class CloudClient
     class Account < ApiStruct.new(:id, :name)
+
+      def self.all(api)
+        self.from_array(api, api.request('/accounts')["accounts"])
+      end
+
       def add_app(app)
         @apps ||= []
         existing_app = @apps.detect { |a| app.id == a.id }

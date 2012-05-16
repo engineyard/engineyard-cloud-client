@@ -20,7 +20,7 @@ module SpecHelpers
     @scenario_email     = scenario['email']
     @scenario_password  = scenario['password']
     @scenario_api_token = scenario['api_token']
-    scenario
+    EY::CloudClient.new(@scenario_api_token, SpecHelpers::UI.new)
   end
 
   def scenario_email

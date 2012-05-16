@@ -41,7 +41,6 @@ RSpec.configure do |config|
 
   config.before(:all) do
     FakeWeb.allow_net_connect = false
-    ENV["CLOUD_URL"] = nil
   end
 
   config.before(:each) do

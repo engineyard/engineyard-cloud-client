@@ -11,8 +11,8 @@ module Scenario
   end
 
   class LinkedApp < Base
-    def initialize(*)
-      super('Linked App', 'linked.app@test.local', 'linked')
+    def initialize(name = 'Linked App', email = 'linked.app@test.local', pass = 'linked')
+      super
       @app = @account.apps.create("name" => "rails232app", "repository_uri" => git_remote)
       @env = @account.environments.create({
         "name" => "giblets",
@@ -78,8 +78,8 @@ module Scenario
   end  # LinkedApp
 
   class MultipleAmbiguousAccounts < LinkedApp
-    def initialize(*)
-      super('Multiple Ambiguous Accounts', 'multiple.ambiguous.accounts@test.local', 'multi')
+    def initialize(name = 'Multiple Ambiguous Accounts', email = 'multiple.ambiguous.accounts@test.local', pass = 'multi')
+      super
       @account2 = @user.accounts.create("name" => "account_2")
       @app2 = @account2.apps.create("name" => "rails232app", "repository_uri" => git_remote)
       @env2 = @account2.environments.create({
@@ -98,13 +98,22 @@ module Scenario
   end
 
   class UnlinkedApp < Base
-    def initialize(*)
-      super('Unlinked App', 'unlinked.app@test.local', 'unlinked')
+    def initialize(name = 'Unlinked App', email = 'unlinked.app@test.local', pass = 'unlinked')
+      super
 
       @app = @account.apps.create({
         "name" => "rails232app",
         "repository_uri" => git_remote
       })
+
+      @other = @account.environments.create({
+        "name" => "chickenwings",
+        "ssh_username" => "ham",
+        "app_server_stack_name" => "nginx_mongrel",
+        "load_balancer_ip_address" => '127.0.0.0',
+        "framework_env" => "production"
+      })
+      @app_env = @app.app_environments.create(:environment => @other)
 
       @env = @account.environments.create({
         "name" => "giblets",
@@ -124,8 +133,8 @@ module Scenario
   end # UnlinkedApp
 
   class LinkedAppNotRunning < Base
-    def initialize(*)
-      super('Linked App Not Running', 'linked.app.not.running@test.local', 'linked.stopped')
+    def initialize(name = 'Linked App Not Running', email = 'linked.app.not.running@test.local', pass = 'linked.stopped')
+      super
       @app = @account.apps.create({
         "name" => "rails232app",
         "repository_uri" => git_remote
@@ -145,15 +154,15 @@ module Scenario
   end # LinkedAppNotRunning
 
   class LinkedAppRedMaster < LinkedApp
-    def initialize(*)
-      super('Linked App Red Master', 'linked.app.red.master@test.local', 'linked.red')
+    def initialize(name = 'Linked App Red Master', email = 'linked.app.red.master@test.local', pass = 'linked.red')
+      super
       @env.instances.first.update(:status => "error")
     end
   end
 
   class OneAppManyEnvs < Base
-    def initialize(*)
-      super('One App Many Envs', 'one.app.many.envs@test.local', '1app2cups')
+    def initialize(name = 'One App Many Envs', email = 'one.app.many.envs@test.local', pass = '1app2cups')
+      super
       @app = @account.apps.create({
         "name" => "rails232app",
         "repository_uri" => git_remote
@@ -194,8 +203,8 @@ module Scenario
   end # OneAppTwoEnvs
 
   class TwoApps < Base
-    def initialize(*)
-      super('Two Apps', 'two.apps@test.local', '2apps')
+    def initialize(name = 'Two Apps', email = 'two.apps@test.local', pass = '2apps')
+      super
       @env1 = @account.environments.create({
           "name" => "giblets",
           "framework_env" => "staging",
@@ -239,16 +248,16 @@ module Scenario
   end # TwoApps
 
   class TwoAppsSameGitUri < TwoApps
-    def initialize(*)
-      super('Two Apps Same Git URI', 'two.apps.same.git.uri@test.local', '2apps1repo')
+    def initialize(name = 'Two Apps Same Git URI', email = 'two.apps.same.git.uri@test.local', pass = '2apps1repo')
+      super
       @app1.update(:repository_uri => "git://github.com/engineyard/dup.git")
       @app2.update(:repository_uri => "git://github.com/engineyard/dup.git")
     end
   end # TwoAppsSameGitUri
 
   class OneAppManySimilarlyNamedEnvs < Base
-    def initialize(*)
-      super('One App Similarly Named Envs', 'one.app.similarly.named.envs@test.local', '1apptwinrepos')
+    def initialize(name = 'One App Similarly Named Envs', email = 'one.app.similarly.named.envs@test.local', pass = '1apptwinrepos')
+      super
       @app = @account.apps.create({
         "name" => "rails232app",
         "repository_uri" => git_remote

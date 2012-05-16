@@ -7,6 +7,7 @@ class App
   property :id, Serial
   property :name, String
   property :repository_uri, String
+  property :app_type_id, String
 
   belongs_to :account
   has n, :app_environments

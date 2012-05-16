@@ -23,13 +23,17 @@ class Environment
     "#<Environment name:#{name} account:#{account.name}>"
   end
 
+  def instances_count
+    instances.size
+  end
+
   def to_api_response(nested = true)
     res = {
       "id"                       => id,
       "ssh_username"             => ssh_username,
       "instances"                => instances.map { |i| i.to_api_response },
       "name"                     => name,
-      "instances_count"          => instances.size,
+      "instances_count"          => instances_count,
       "app_server_stack_name"    => app_server_stack_name,
       "load_balancer_ip_address" => load_balancer_ip_address,
       "framework_env"            => framework_env,
