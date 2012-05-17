@@ -15,32 +15,11 @@ class Environment
   has n, :apps, :through => :app_environments
   has n, :instances
 
-  def app_master
-    @app_master ||= instances.find { |i| %w[solo app_master].include?(i.role) }
-  end
-
   def inspect
     "#<Environment name:#{name} account:#{account.name}>"
   end
 
   def instances_count
     instances.size
-  end
-
-  def to_api_response(nested = true)
-    res = {
-      "id"                       => id,
-      "ssh_username"             => ssh_username,
-      "instances"                => instances.map { |i| i.to_api_response },
-      "name"                     => name,
-      "instances_count"          => instances_count,
-      "app_server_stack_name"    => app_server_stack_name,
-      "load_balancer_ip_address" => load_balancer_ip_address,
-      "framework_env"            => framework_env,
-      "app_master"               => app_master && app_master.to_api_response,
-      "account"                  => account.to_api_response,
-    }
-    res["apps"] = apps.map { |app| app.to_api_response(false) } if nested
-    res
   end
 end

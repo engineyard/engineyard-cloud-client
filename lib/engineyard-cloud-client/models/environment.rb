@@ -7,20 +7,18 @@ module EY
                                       :username, :app_server_stack_name,
                                       :load_balancer_ip_address
                                      )
-      attr_accessor :ignore_bad_master, :apps, :account, :instances, :app_master
+      attr_accessor :ignore_bad_bridge, :apps, :account
 
       def attributes=(attrs)
         account_attrs    = attrs.delete('account')
         apps_attrs       = attrs.delete('apps')
         instances_attrs  = attrs.delete('instances')
-        app_master_attrs = attrs.delete('app_master')
 
         super
 
         self.account    = account_attrs if account_attrs
         self.apps       = apps_attrs if apps_attrs
-        self.instances  = Instance.from_array(api, instances_attrs, 'environment' => self) if instances_attrs
-        self.app_master = Instance.from_hash(api, app_master_attrs.merge('environment' => self)) if app_master_attrs
+        self.instances  = instances_attrs if instances_attrs
       end
 
       def add_app_environment(app_env)
@@ -42,6 +40,9 @@ module EY
         @account
       end
 
+      # Creating an AppEnvironment will come back and call add_app_environment
+      # (above) to associate this model with the AppEnvironment. (that's why we
+      # don't save anything here.)
       def apps=(apps_attrs)
         (apps_attrs || []).each do |app|
           AppEnvironment.from_hash(api, {'app' => app, 'environment' => self})
@@ -50,6 +51,14 @@ module EY
 
       def apps
         app_environments.map { |app_env| app_env.app }
+      end
+
+      def instances=(instances_attrs)
+        @instances = Instance.from_array(api, instances_attrs, 'environment' => self)
+      end
+
+      def instances
+        @instances || (self.instances = request_instances)
       end
 
       # Return list of all Environments linked to all current user's accounts
@@ -67,7 +76,7 @@ module EY
       def self.resolve(api, constraints)
         clean_constraints = constraints.reject { |k,v| v.nil? }
         params = {'constraints' => clean_constraints}
-        response = api.request("/environments/resolve", :method => :get, :params => params)
+        response = api.request("/environments/resolve", :method => :get, :params => params)['resolver']
         matches = from_array(api, response['matches'])
         ResolverResult.new(api, matches, response['errors'], response['suggestions'])
       end
@@ -115,17 +124,18 @@ module EY
         instances.select { |inst| inst.has_app_code? }
       end
 
-      def app_master!
-        master = app_master
-        if master.nil?
-          raise NoAppMasterError.new(name)
-        elsif !ignore_bad_master && master.status != "running"
-          raise BadAppMasterStatusError.new(master.status, EY::CloudClient.endpoint)
-        end
-        master
+      def bridge
+        @bridge ||= instances.detect { |inst| inst.bridge? }
       end
 
-      alias bridge! app_master!
+      def bridge!
+        if bridge.nil?
+          raise NoBridgeError.new(name)
+        elsif !ignore_bad_bridge && bridge.status != "running"
+          raise BadBridgeStatusError.new(bridge.status, EY::CloudClient.endpoint)
+        end
+        bridge
+      end
 
       def rebuild
         api.request("/environments/#{id}/update_instances", :method => :put)
@@ -189,11 +199,11 @@ module EY
         name.gsub(/^#{Regexp.quote(app.name)}_/, '')
       end
 
-      def launch
-        Launchy.open(app_master!.hostname_url)
-      end
-
       private
+
+      def request_instances
+        api.request("/environments/#{id}/instances")["instances"]
+      end
 
       def no_migrate?(deploy_options)
         deploy_options.key?('migrate') && deploy_options['migrate'] == false

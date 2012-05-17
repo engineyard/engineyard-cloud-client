@@ -16,14 +16,8 @@ class Instance
     "#<Instance environment:#{environment.name} role:#{role} name:#{name}>"
   end
 
-  def to_api_response
-    {
-      "id"              => id,
-      "role"            => role,
-      "name"            => name,
-      "status"          => status,
-      "amazon_id"       => amazon_id,
-      "public_hostname" => public_hostname,
-    }
+  def bridge
+    %w[app_master solo].include?(role)
   end
+
 end

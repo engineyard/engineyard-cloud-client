@@ -8,9 +8,6 @@ require File.expand_path('../scenarios', __FILE__)
 require File.expand_path('../models', __FILE__)
 
 Rabl.register!
-Rabl.configure do |config|
-  config.include_json_root = false
-end
 
 class FakeAwsm < Sinatra::Base
   disable :show_exceptions
@@ -69,7 +66,7 @@ class FakeAwsm < Sinatra::Base
   end
 
   get "/api/v2/current_user" do
-    { "user" => @user.to_api_response }.to_json
+    render :rabl, :user, :format => "json"
   end
 
   get "/api/v2/accounts" do
@@ -96,6 +93,12 @@ class FakeAwsm < Sinatra::Base
   get "/api/v2/app_environments/resolve" do
     @resolver = EY::Resolver.app_env_resolver(@user, params['constraints'])
     render :rabl, :resolve_app_environments, :format => "json"
+  end
+
+  get "/api/v2/environments/:env_id/instances" do
+    environment = @user.accounts.environments.get(params['env_id'])
+    @instances = environment.instances
+    render :rabl, :instances, :format => "json"
   end
 
   get "/api/v2/environments/:env_id/logs" do

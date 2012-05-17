@@ -12,11 +12,4 @@ class User
 
   has n, :accounts
 
-  def to_api_response
-    {
-      "id"    => id,
-      "name"  => name,
-      "email" => email,
-    }
-  end
 end

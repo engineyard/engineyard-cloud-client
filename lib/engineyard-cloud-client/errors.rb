@@ -23,15 +23,15 @@ module EY
       end
     end
 
-    class NoAppMasterError < Error
+    class NoBridgeError < Error
       def initialize(env_name)
         super "The environment '#{env_name}' does not have a master instance."
       end
     end
 
-    class BadAppMasterStatusError < Error
-      def initialize(master_status, endpoint)
-        super %|Application master's status is not "running" (green); it is "#{master_status}". Go to #{endpoint} to address this problem.|
+    class BadBridgeStatusError < Error
+      def initialize(bridge_status, endpoint)
+        super %|Application master's status is not "running" (green); it is "#{bridge_status}". Go to #{endpoint} to address this problem.|
       end
     end
   end

@@ -14,11 +14,4 @@ class AppEnvironment
     "#<AppEnvironment app:#{app.name} env:#{environment.name}>"
   end
 
-  def to_api_response
-    {
-      'id'          => id,
-      'app'         => app.to_api_response(false),
-      'environment' => environment.to_api_response(false),
-    }
-  end
 end

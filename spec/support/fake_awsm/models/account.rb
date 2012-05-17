@@ -10,9 +10,4 @@ class Account
   has n, :environments
   has n, :apps
 
-  def to_api_response
-    {
-      "name" => name
-    }
-  end
 end

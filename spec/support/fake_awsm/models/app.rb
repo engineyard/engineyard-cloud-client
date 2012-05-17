@@ -21,14 +21,4 @@ class App
     "#<App name:#{name} account:#{account.name}>"
   end
 
-  def to_api_response(nested = true)
-    res = {
-      "id"             => id,
-      "name"           => name,
-      "repository_uri" => repository_uri,
-      "account"        => account.to_api_response,
-    }
-    res['environments'] = environments.map { |env| env.to_api_response(false) } if nested
-    res
-  end
 end

@@ -121,6 +121,7 @@ describe EY::CloudClient::Environment do
                "name"=>nil,
                "amazon_id"=>nil,
                "role"=>"solo",
+               "bridge"=>true,
                "id"=>135930,
                "status"=>"starting"}],
             "app_master"=>
@@ -128,6 +129,7 @@ describe EY::CloudClient::Environment do
               "name"=>nil,
               "amazon_id"=>nil,
               "role"=>"solo",
+              "bridge"=>true,
               "id"=>135930,
               "status"=>"starting"},
            "framework_env"=>"production",
@@ -156,7 +158,7 @@ describe EY::CloudClient::Environment do
 
       env.name.should == "myapp_production"
       env.instances.count.should == 1
-      env.app_master.role.should == "solo"
+      env.bridge.role.should == "solo"
     end
   end
 
@@ -204,6 +206,7 @@ describe EY::CloudClient::Environment do
       instance_data = {
         "id" => "1",
         "role" => "app_master",
+        "bridge" => true,
         "amazon_id" => "i-likebeer",
         "public_hostname" => "banana_master"
       }
@@ -224,49 +227,50 @@ describe EY::CloudClient::Environment do
     end
   end
 
-  describe "#app_master!" do
-    def make_env_with_master(app_master)
-      if app_master
-        app_master = {
+  describe "#bridge!" do
+    def make_env_with_bridge(bridge)
+      if bridge
+        bridge = {
           "id" => 44206,
           "role" => "solo",
-        }.merge(app_master)
+          "bridge" => true,
+        }.merge(bridge)
       end
 
       EY::CloudClient::Environment.from_hash(ey_api, {
         "id" => 11830,
         "name" => "guinea-pigs-are-delicious",
-        "app_master" => app_master,
-        "instances" => [app_master].compact,
+        "app_master" => bridge,
+        "instances" => [bridge].compact,
       })
     end
 
 
-    it "returns the app master if it's present and running" do
-      env = make_env_with_master("status" => "running")
-      env.app_master!.should_not be_nil
-      env.app_master!.id.should == 44206
+    it "returns the bridge if it's present and running" do
+      env = make_env_with_bridge("status" => "running")
+      env.bridge!.should_not be_nil
+      env.bridge!.id.should == 44206
     end
 
-    it "raises an error if the app master is in a non-running state" do
-      env = make_env_with_master("status" => "error")
+    it "raises an error if the bridge is in a non-running state" do
+      env = make_env_with_bridge("status" => "error")
       lambda {
-        env.app_master!
-      }.should raise_error(EY::CloudClient::BadAppMasterStatusError)
+        env.bridge!
+      }.should raise_error(EY::CloudClient::BadBridgeStatusError)
     end
 
-    it "returns the app master if told to ignore the app master being in a non-running state" do
-      env = make_env_with_master("status" => "error")
-      env.ignore_bad_master = true
-      env.app_master!.should_not be_nil
-      env.app_master!.id.should == 44206
+    it "returns the bridge if told to ignore the bridge being in a non-running state" do
+      env = make_env_with_bridge("status" => "error")
+      env.ignore_bad_bridge = true
+      env.bridge!.should_not be_nil
+      env.bridge!.id.should == 44206
     end
 
-    it "raises an error if the app master is absent" do
-      env = make_env_with_master(nil)
+    it "raises an error if the bridge has fallen down" do
+      env = make_env_with_bridge(nil)
       lambda {
-        env.app_master!
-      }.should raise_error(EY::CloudClient::NoAppMasterError)
+        env.bridge!
+      }.should raise_error(EY::CloudClient::NoBridgeError)
     end
   end
 

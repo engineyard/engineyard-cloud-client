@@ -35,4 +35,13 @@ describe EY::CloudClient::Environment do
     end
   end
 
+  describe "loading instances" do
+    it "requests instances" do
+      api = api_scenario "Linked App"
+      result = EY::CloudClient::Environment.resolve(api, 'account_name' => 'main', 'app_name' => 'rails232app', 'environment_name' => 'giblets')
+      env = result.matches.first
+      env.instances.size.should == env.instances_count
+    end
+  end
+
 end
