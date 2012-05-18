@@ -7,7 +7,7 @@ require 'engineyard-cloud-client/test/ui'
 module EY::CloudClient::Test
   class Scenario
     def self.[](name)
-      scenarios[name] or raise "Scenario #{name.inspect} not found in:\n\t#{scenarios.keys.join('\n\t')}"
+      scenarios[name] or raise "Scenario #{name.inspect} not found in:\n\t#{scenarios.keys.join("\n\t")}"
     end
 
     def self.scenarios

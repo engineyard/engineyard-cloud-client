@@ -30,4 +30,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency('fakeweb-matcher')
   s.add_development_dependency('sinatra')
   s.add_development_dependency('realweb', '~>0.2.2')
+  s.add_development_dependency('dm-core')
+  s.add_development_dependency('dm-migrations')
+  s.add_development_dependency('dm-aggregates')
+  s.add_development_dependency('dm-sqlite-adapter')
+  s.add_development_dependency('ey_resolver', '~>0.2.1')
+  s.add_development_dependency('rabl')
 end
