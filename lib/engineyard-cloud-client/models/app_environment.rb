@@ -28,16 +28,24 @@ module EY
         raise ArgumentError, 'AppEnvironment created without environment!' unless environment
       end
 
-      def app=(app_or_hash)
-        super App.from_hash(api, app_or_hash)
+      def set_app(app_or_hash)
+        self.app = App.from_hash(api, app_or_hash)
         app.add_app_environment(self)
         app
       end
 
-      def environment=(env_or_hash)
-        super Environment.from_hash(api, env_or_hash)
+      def set_environment(env_or_hash)
+        self.environment = Environment.from_hash(api, env_or_hash)
         environment.add_app_environment(self)
         environment
+      end
+
+      def attributes=(attrs)
+        app_attrs         = attrs.delete('app')
+        environment_attrs = attrs.delete('environment')
+        super
+        set_app         app_attrs         if app_attrs
+        set_environment environment_attrs if environment_attrs
       end
 
       def account_name
@@ -70,10 +78,6 @@ module EY
 
       def short_environment_name
         environment.name.gsub(/^#{Regexp.quote(app.name)}_/, '')
-      end
-
-      def launch
-        Launchy.open(environment.bridge!.hostname_url)
       end
 
     end

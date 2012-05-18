@@ -53,13 +53,13 @@ module EY
         existing_app_env || app_env
       end
 
-      def account=(account_attrs)
+      def set_account(account_attrs)
         @account = Account.from_hash(api, account_attrs)
         @account.add_app(self)
         @account
       end
 
-      def environments=(environments_attrs)
+      def set_environments(environments_attrs)
         (environments_attrs || []).each do |env|
           AppEnvironment.from_hash(api, {'app' => self, 'environment' => env})
         end
@@ -69,8 +69,8 @@ module EY
         account_attrs      = attrs.delete('account')
         environments_attrs = attrs.delete('environments')
         super
-        self.account = account_attrs if account_attrs
-        self.environments = environments_attrs if environments_attrs
+        set_account      account_attrs      if account_attrs
+        set_environments environments_attrs if environments_attrs
       end
     end
   end

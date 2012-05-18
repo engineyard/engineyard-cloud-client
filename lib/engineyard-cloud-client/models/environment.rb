@@ -16,9 +16,9 @@ module EY
 
         super
 
-        self.account    = account_attrs if account_attrs
-        self.apps       = apps_attrs if apps_attrs
-        self.instances  = instances_attrs if instances_attrs
+        set_account   account_attrs   if account_attrs
+        set_apps      apps_attrs      if apps_attrs
+        set_instances instances_attrs if instances_attrs
       end
 
       def add_app_environment(app_env)
@@ -34,7 +34,7 @@ module EY
         @app_environments ||= []
       end
 
-      def account=(account_attrs)
+      def set_account(account_attrs)
         @account = Account.from_hash(api, account_attrs)
         @account.add_environment(self)
         @account
@@ -43,7 +43,7 @@ module EY
       # Creating an AppEnvironment will come back and call add_app_environment
       # (above) to associate this model with the AppEnvironment. (that's why we
       # don't save anything here.)
-      def apps=(apps_attrs)
+      def set_apps(apps_attrs)
         (apps_attrs || []).each do |app|
           AppEnvironment.from_hash(api, {'app' => app, 'environment' => self})
         end
@@ -53,7 +53,7 @@ module EY
         app_environments.map { |app_env| app_env.app }
       end
 
-      def instances=(instances_attrs)
+      def set_instances(instances_attrs)
         @instances = load_instances(instances_attrs)
       end
 
