@@ -40,6 +40,7 @@ describe EY::CloudClient::Environment do
       api = scenario_cloud_client "Linked App"
       result = EY::CloudClient::Environment.resolve(api, 'account_name' => 'main', 'app_name' => 'rails232app', 'environment_name' => 'giblets')
       env = result.matches.first
+      env.bridge.role.should == 'app_master'
       env.instances.size.should == env.instances_count
     end
   end

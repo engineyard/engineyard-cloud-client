@@ -54,11 +54,11 @@ module EY
       end
 
       def instances=(instances_attrs)
-        @instances = Instance.from_array(api, instances_attrs, 'environment' => self)
+        @instances = load_instances(instances_attrs)
       end
 
       def instances
-        @instances || (self.instances = request_instances)
+        @instances ||= request_instances
       end
 
       # Return list of all Environments linked to all current user's accounts
@@ -202,7 +202,12 @@ module EY
       private
 
       def request_instances
-        api.request("/environments/#{id}/instances")["instances"]
+        instances_attrs = api.request("/environments/#{id}/instances")["instances"]
+        load_instances(instances_attrs)
+      end
+
+      def load_instances(instances_attrs)
+        Instance.from_array(api, instances_attrs, 'environment' => self)
       end
 
       def no_migrate?(deploy_options)
