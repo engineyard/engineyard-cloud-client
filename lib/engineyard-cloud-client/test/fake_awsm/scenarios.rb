@@ -99,6 +99,18 @@ module Scenario
     end
   end
 
+  class AppWithoutEnv < Base
+    def initialize(name = 'App Without Env', email = 'app.without.env@test.local', pass = 'without')
+      super
+
+      @app = @account.apps.create({
+        "name" => "rails232app",
+        "repository_uri" => git_remote
+      })
+    end
+  end # AppWithoutEnv
+
+
   class UnlinkedApp < Base
     def initialize(name = 'Unlinked App', email = 'unlinked.app@test.local', pass = 'unlinked')
       super

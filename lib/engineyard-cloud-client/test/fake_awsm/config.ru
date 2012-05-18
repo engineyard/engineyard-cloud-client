@@ -16,6 +16,7 @@ class FakeAwsm < Sinatra::Base
 
   SCENARIOS = [
     Scenario::Base.new,
+    Scenario::AppWithoutEnv.new,
     Scenario::UnlinkedApp.new,
     Scenario::TwoApps.new,
     Scenario::LinkedApp.new,
