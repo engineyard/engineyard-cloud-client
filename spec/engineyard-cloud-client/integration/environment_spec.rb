@@ -6,6 +6,15 @@ describe EY::CloudClient::Environment do
     EY::CloudClient.endpoint = EY::CloudClient::Test::FakeAwsm.uri
   end
 
+  describe ".all" do
+    it "finds all the environments" do
+      api = scenario_cloud_client "One App Many Envs"
+      envs = EY::CloudClient::Environment.all(api)
+      envs.size.should == 3
+      envs.map(&:name).should =~ %w[giblets bakon beef]
+    end
+  end
+
   describe ".resolve" do
     it "finds an environment" do
       api = scenario_cloud_client "Multiple Ambiguous Accounts"
