@@ -10,6 +10,8 @@ class AppEnvironment
   belongs_to :app
   belongs_to :environment
 
+  has n, :deployments
+
   def inspect
     "#<AppEnvironment app:#{app.name} env:#{environment.name}>"
   end

@@ -10,7 +10,7 @@ require 'engineyard-cloud-client/rest_client_ext'
 require 'engineyard-cloud-client/resolver_result'
 require 'engineyard-cloud-client/version'
 require 'engineyard-cloud-client/errors'
-require 'json'
+require 'multi_json'
 require 'pp'
 
 module EY
@@ -40,6 +40,10 @@ module EY
     def initialize(token, ui)
       self.token = token
       self.ui = ui
+    end
+
+    def ==(other)
+      other.is_a?(self.class) && other.token == token
     end
 
     def registry
@@ -99,7 +103,9 @@ module EY
         ui.debug("Params", params.inspect)
         case method
         when :get, :delete, :head
-          url.query = RestClient::Payload::UrlEncoded.new(params).to_s
+          unless params.empty?
+            url.query = RestClient::Payload::UrlEncoded.new(params).to_s
+          end
           resp = RestClient.send(method, url.to_s, headers)
         else
           resp = RestClient.send(method, url.to_s, params, headers)
@@ -122,9 +128,9 @@ module EY
         data = ''
       elsif resp.headers[:content_type] =~ /application\/json/
         begin
-          data = JSON.parse(resp.body)
+          data = MultiJson.decode(resp.body)
           ui.debug("Response", "\n" + data.pretty_inspect)
-        rescue JSON::ParserError
+        rescue MultiJson::DecodeError
           ui.debug("Raw response", resp.body)
           raise RequestFailed, "Response was not valid JSON."
         end

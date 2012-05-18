@@ -18,7 +18,7 @@ describe EY::CloudClient::App do
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/apps",
         :body => response.to_json, :content_type => "application/json")
 
-      apps = EY::CloudClient::App.all(ey_api)
+      apps = EY::CloudClient::App.all(cloud_client)
 
       apps.length.should == 1
       apps.first.name.should == "myapp"
@@ -27,7 +27,7 @@ describe EY::CloudClient::App do
 
   describe ".create" do
     it "hits the create app action in the API" do
-      account = EY::CloudClient::Account.new(ey_api, {:id => 1234, :name => 'myaccount'})
+      account = EY::CloudClient::Account.new(cloud_client, {:id => 1234, :name => 'myaccount'})
 
       response = {
         "app"=>{
@@ -42,7 +42,7 @@ describe EY::CloudClient::App do
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps",
         :body => response.to_json, :content_type => "application/json")
 
-      app = EY::CloudClient::App.create(ey_api, {
+      app = EY::CloudClient::App.create(cloud_client, {
         "account"        => account,
         "name"           => 'myapp',
         "repository_uri" => 'git@github.com:myaccount/myapp.git',

@@ -38,7 +38,7 @@ describe EY::CloudClient::Environment do
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments",
         :body => response.to_json, :content_type => "application/json")
 
-      environments = EY::CloudClient::Environment.all(ey_api)
+      environments = EY::CloudClient::Environment.all(cloud_client)
 
       environments.length.should == 1
       environments.first.name.should == "myapp_production"
@@ -47,8 +47,8 @@ describe EY::CloudClient::Environment do
 
   describe ".create" do
     it "hits the create action in the API without any cluster configuration (0 instances booted)" do
-      account = EY::CloudClient::Account.new(ey_api, {:id => 1234, :name => 'myaccount'})
-      app = EY::CloudClient::App.new(ey_api, {:account => account, :id => 12345, :name => 'myapp',
+      account = EY::CloudClient::Account.new(cloud_client, {:id => 1234, :name => 'myaccount'})
+      app = EY::CloudClient::App.new(cloud_client, {:account => account, :id => 12345, :name => 'myapp',
         :repository_uri => 'git@github.com:myaccount/myapp.git', :app_type_id => 'rails3'})
 
       response =   {
@@ -82,7 +82,7 @@ describe EY::CloudClient::Environment do
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
         :body => response.to_json, :content_type => "application/json")
 
-      env = EY::CloudClient::Environment.create(ey_api, {
+      env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
         "name"                  => 'myapp_production',
         "app_server_stack_name" => 'nginx_thin',
@@ -96,8 +96,8 @@ describe EY::CloudClient::Environment do
     end
 
     it "hits the create action and requests a solo instance booted" do
-      account = EY::CloudClient::Account.from_hash(ey_api, {:id => 1234, :name => 'myaccount'})
-      app = EY::CloudClient::App.from_hash(ey_api, {:account => account, :id => 12345, :name => 'myapp',
+      account = EY::CloudClient::Account.from_hash(cloud_client, {:id => 1234, :name => 'myaccount'})
+      app = EY::CloudClient::App.from_hash(cloud_client, {:account => account, :id => 12345, :name => 'myapp',
         :repository_uri => 'git@github.com:myaccount/myapp.git', :app_type_id => 'rails3'})
 
       response =   {
@@ -145,7 +145,7 @@ describe EY::CloudClient::Environment do
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
         :body => response.to_json, :content_type => "application/json")
 
-      env = EY::CloudClient::Environment.create(ey_api, {
+      env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
         "name"                  => "myapp_production",
         "app_server_stack_name" => "nginx_thin",
@@ -170,7 +170,7 @@ describe EY::CloudClient::Environment do
 
   describe "#rebuild" do
     it "hits the rebuild action in the API" do
-      env = EY::CloudClient::Environment.from_hash(ey_api, { "id" => 46534 })
+      env = EY::CloudClient::Environment.from_hash(cloud_client, { "id" => 46534 })
 
       FakeWeb.register_uri(
         :put,
@@ -186,7 +186,7 @@ describe EY::CloudClient::Environment do
 
   describe "#run_custom_recipes" do
     it "hits the rebuild action in the API" do
-      env = EY::CloudClient::Environment.from_hash(ey_api, { "id" => 46534 })
+      env = EY::CloudClient::Environment.from_hash(cloud_client, { "id" => 46534 })
 
       FakeWeb.register_uri(
         :put,
@@ -211,7 +211,7 @@ describe EY::CloudClient::Environment do
         "public_hostname" => "banana_master"
       }
 
-      env = EY::CloudClient::Environment.from_hash(ey_api, {
+      env = EY::CloudClient::Environment.from_hash(cloud_client, {
         "id" => 10291,
         "instances" => [instance_data],
       })
@@ -223,7 +223,7 @@ describe EY::CloudClient::Environment do
       )
 
       env.should have(1).instances
-      env.instances.first.should == EY::CloudClient::Instance.from_hash(ey_api, instance_data.merge('environment' => env))
+      env.instances.first.should == EY::CloudClient::Instance.from_hash(cloud_client, instance_data.merge('environment' => env))
     end
   end
 
@@ -237,7 +237,7 @@ describe EY::CloudClient::Environment do
         }.merge(bridge)
       end
 
-      EY::CloudClient::Environment.from_hash(ey_api, {
+      EY::CloudClient::Environment.from_hash(cloud_client, {
         "id" => 11830,
         "name" => "guinea-pigs-are-delicious",
         "app_master" => bridge,
@@ -276,8 +276,8 @@ describe EY::CloudClient::Environment do
 
   describe "#shorten_name_for(app)" do
     def short(environment_name, app_name)
-      env = EY::CloudClient::Environment.from_hash(ey_api, {'name' => environment_name})
-      app = EY::CloudClient::App.from_hash(ey_api, {'name' => app_name})
+      env = EY::CloudClient::Environment.from_hash(cloud_client, {'name' => environment_name})
+      app = EY::CloudClient::App.from_hash(cloud_client, {'name' => app_name})
       env.shorten_name_for(app)
     end
 

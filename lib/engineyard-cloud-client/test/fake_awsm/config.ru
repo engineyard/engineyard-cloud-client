@@ -27,12 +27,8 @@ class FakeAwsm < Sinatra::Base
     Scenario::TwoAppsSameGitUri.new,
   ]
 
-  def initialize(*_)
+  def initialize(*)
     super
-    # the class var is because the object passed to #run is #dup-ed on
-    # every request. It makes sense; you hardly ever want to keep
-    # state in your application object (accidentally or otherwise),
-    # but in this situation that's exactly what we want to do.
     @user = Scenario::Base.new.user
   end
 
@@ -63,6 +59,19 @@ class FakeAwsm < Sinatra::Base
         "api_token" => user.api_token,
       }
     }.to_json
+  end
+
+  get "/scenarios" do
+    scenarios = SCENARIOS.map do |scen|
+      user = scen.user
+      {
+        :name      => user.name,
+        :email     => user.email,
+        :password  => user.password,
+        :api_token => user.api_token,
+      }
+    end
+    {'scenarios' => scenarios}.to_json
   end
 
   get "/api/v2/current_user" do

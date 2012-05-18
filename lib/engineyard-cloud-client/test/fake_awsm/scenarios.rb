@@ -1,3 +1,5 @@
+require 'engineyard-cloud-client/test/fake_awsm'
+
 module Scenario
   class Base
     attr_accessor :git_remote

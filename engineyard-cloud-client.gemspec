@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir.glob("spec/**/*")
 
   s.add_dependency('rest-client', '~>1.6.0')
-  s.add_dependency('json_pure')
+  s.add_dependency('multi_json')
   s.add_dependency('launchy', '2.0.5')
 
   s.add_development_dependency('rspec', '~>2.0')

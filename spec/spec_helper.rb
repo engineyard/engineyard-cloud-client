@@ -20,6 +20,7 @@ require 'json'
 # Engineyard gem
 $LOAD_PATH.unshift(File.join(EY_ROOT, "lib"))
 require 'engineyard-cloud-client'
+require 'engineyard-cloud-client/test'
 
 # Spec stuff
 require 'rspec'
@@ -29,8 +30,8 @@ require 'pp'
 support = Dir[File.join(EY_ROOT,'/spec/support/*.rb')]
 support.each{|helper| require helper }
 
-support = Dir[File.join(EY_ROOT,'/spec/support/fake_awsm/*.rb')]
-support.each{|helper| require helper }
+#support = Dir[File.join(EY_ROOT,'/spec/support/fake_awsm/*.rb')]
+#support.each{|helper| require helper }
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

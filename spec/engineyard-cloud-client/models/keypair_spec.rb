@@ -17,7 +17,7 @@ describe EY::CloudClient::Keypair do
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/keypairs",
         :body => response.to_json, :content_type => "application/json")
 
-      keypairs = EY::CloudClient::Keypair.all(ey_api)
+      keypairs = EY::CloudClient::Keypair.all(cloud_client)
 
       keypairs.length.should == 1
       keypairs.first.name.should == "macbook pro"
@@ -38,7 +38,7 @@ describe EY::CloudClient::Keypair do
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/keypairs",
         :body => response.to_json, :content_type => "application/json")
 
-      keypair = EY::CloudClient::Keypair.create(ey_api, {
+      keypair = EY::CloudClient::Keypair.create(cloud_client, {
         "name"       => 'laptop',
         "public_key" => "ssh-rsa OTHERKEYPAIR"
       })
