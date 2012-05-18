@@ -3,16 +3,9 @@ attributes :id, :ssh_username, :name, :instances_count, :app_server_stack_name, 
 child :account do
   attributes :id, :name
 end
-child :app_master do
-  attributes :id, :role, :name, :status, :amazon_id, :public_hostname
-end
-child :instances do
-  attributes :id, :role, :name, :status, :amazon_id, :public_hostname
-end
-
 child :apps do
-  attributes :id, :name, :repository_uri
+  attributes :id, :name, :repository_uri, :app_type_id
   child :account do
-    attributes :name
+    attributes :id, :name
   end
 end
