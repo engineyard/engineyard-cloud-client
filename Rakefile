@@ -19,7 +19,15 @@ end
 
 def bump
   require 'engineyard-cloud-client'
-  version_file = "module EY\n  VERSION = '_VERSION_GOES_HERE_'\nend\n"
+  version_file = <<-EOF
+# This file is maintained by a herd of rabid monkeys with Rakes.
+module EY
+  class CloudClient
+    VERSION = '_VERSION_GOES_HERE_'
+  end
+end
+# Please be aware that the monkeys like tho throw poo sometimes.
+  EOF
 
   new_version = if EY::CloudClient::VERSION =~ /\.pre$/
                   EY::CloudClient::VERSION.gsub(/\.pre$/, '')
