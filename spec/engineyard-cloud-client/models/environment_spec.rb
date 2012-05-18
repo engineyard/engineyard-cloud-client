@@ -35,7 +35,7 @@ describe EY::CloudClient::Environment do
         ]
       }
 
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments",
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true",
         :body => response.to_json, :content_type => "application/json")
 
       environments = EY::CloudClient::Environment.all(cloud_client)

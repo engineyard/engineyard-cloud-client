@@ -63,7 +63,7 @@ module EY
 
       # Return list of all Environments linked to all current user's accounts
       def self.all(api)
-        self.from_array(api, api.request('/environments')["environments"])
+        self.from_array(api, api.request('/environments?no_instances=true')["environments"])
       end
 
       # Return a constrained list of environments given a set of constraints like:

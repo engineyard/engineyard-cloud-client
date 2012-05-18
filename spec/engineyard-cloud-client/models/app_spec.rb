@@ -15,7 +15,7 @@ describe EY::CloudClient::App do
         ]
       }
 
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/apps",
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/apps?no_instances=true",
         :body => response.to_json, :content_type => "application/json")
 
       apps = EY::CloudClient::App.all(cloud_client)
