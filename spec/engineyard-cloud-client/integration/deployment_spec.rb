@@ -24,16 +24,23 @@ describe EY::CloudClient::AppEnvironment do
       deployment.commit.should be_nil
       deployment.resolved_ref.should be_nil
 
+      deployment.created_at.should be_nil
+      deployment.finished_at.should be_nil
+
       deployment.start
 
+      deployment.created_at.should_not be_nil
+      deployment.finished_at.should be_nil
       deployment.config.should == {'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
-      deployment.commit.should_not be_nil
+      deployment.commit.should =~ /[0-9a-f]{40}/
       deployment.resolved_ref.should_not be_nil
       deployment.out << "Test output"
       deployment.out << "Test error"
       deployment.successful = true
       deployment.finished
       deployment.should be_finished
+      deployment.created_at.should be_within(5).of(Time.now)
+      deployment.finished_at.should be_within(5).of(Time.now)
 
       found_dep = @app_env.last_deployment
       found_dep.id.should == deployment.id

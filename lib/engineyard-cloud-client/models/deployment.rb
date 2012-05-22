@@ -46,6 +46,14 @@ module EY
       alias deployed_by user_name
       alias deployed_by= user_name=
 
+      def created_at
+        super && (@created_at ||= Time.parse(super))
+      end
+
+      def finished_at
+        super && (@finished_at ||= Time.parse(super))
+      end
+
       def config
         return {} unless deployed_by # not started yet so not all info is here
         @config ||= {'deployed_by' => deployed_by}.merge(extra_config)
