@@ -174,28 +174,23 @@ class FakeAwsm < Sinatra::Base
     ""
   end
 
-  get "/api/v2/apps/:app_id/environments/:environment_id/deployments/last" do
-    {
-      "deployment" => {
-        "id" => 3,
-        "ref" => "HEAD",
-        "resolved_ref" => "HEAD",
-        "commit" => 'a'*40,
-        "user_name" => "User Name",
-        "migrate_command" => "rake db:migrate --trace",
-        "created_at" => Time.now.utc - 3600,
-        "finished_at" => Time.now.utc - 3400,
-        "successful" => true,
-      }
-    }.to_json
+  post "/api/v2/apps/:app_id/environments/:environment_id/deployments" do
+    app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
+    @deployment = app_env.deployments.create(params[:deployment])
+    render :rabl, :deployment, :format => "json"
   end
 
-  post "/api/v2/apps/:app_id/environments/:environment_id/deployments" do
-    {"deployment" => params[:deployment].merge({"id" => 2, "commit" => 'a'*40, "resolved_ref" => "resolved-#{params[:deployment][:ref]}"})}.to_json
+  get "/api/v2/apps/:app_id/environments/:environment_id/deployments/last" do
+    app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
+    @deployment = app_env.deployments.last
+    render :rabl, :deployment, :format => "json"
   end
 
   put "/api/v2/apps/:app_id/environments/:environment_id/deployments/:deployment_id/finished" do
-    {"deployment" => params[:deployment].merge({"id" => 2, "finished_at" => Time.now})}.to_json
+    app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
+    @deployment = app_env.deployments.get(params[:deployment_id])
+    @deployment.finished!(params[:deployment])
+    render :rabl, :deployment, :format => "json"
   end
 
   post "/api/v2/authenticate" do
