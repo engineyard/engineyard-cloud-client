@@ -21,7 +21,7 @@ describe EY::CloudClient::Environment do
 
     it "includes apps in environments" do
       api = scenario_cloud_client "One App Many Envs"
-      envs = EY::CloudClient::Environment.all(api)
+      envs = api.environments
       envs.map do |env|
         env.apps.first && env.apps.first.name
       end.should == ['rails232app', 'rails232app', nil] # 2 envs with the same app, 1 without
@@ -31,7 +31,7 @@ describe EY::CloudClient::Environment do
   describe ".resolve" do
     it "finds an environment" do
       api = scenario_cloud_client "Multiple Ambiguous Accounts"
-      result = EY::CloudClient::Environment.resolve(api, 'environment_name' => 'giblets', 'account_name' => 'main' )
+      result = api.resolve_environments('environment_name' => 'giblets', 'account_name' => 'main' )
       result.should be_one_match
     end
 

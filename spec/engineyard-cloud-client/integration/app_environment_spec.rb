@@ -9,7 +9,7 @@ describe EY::CloudClient::AppEnvironment do
   describe ".resolve" do
     it "finds an environment" do
       api = scenario_cloud_client "Multiple Ambiguous Accounts"
-      result = EY::CloudClient::AppEnvironment.resolve(api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
+      result = api.resolve_app_environments('app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
       result.should be_one_match
     end
 

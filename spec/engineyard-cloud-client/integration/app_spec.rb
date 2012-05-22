@@ -17,7 +17,7 @@ describe EY::CloudClient::App do
 
     it "includes environments in all apps" do
       api = scenario_cloud_client "One App Many Envs"
-      app = EY::CloudClient::App.all(api).first
+      app = api.apps.first
       app.environments.size.should == 2
       app.environments.map(&:name).should =~ %w[giblets bakon]
     end
