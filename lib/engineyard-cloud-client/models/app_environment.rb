@@ -1,4 +1,3 @@
-require 'launchy'
 require 'engineyard-cloud-client/models'
 require 'engineyard-cloud-client/errors'
 
