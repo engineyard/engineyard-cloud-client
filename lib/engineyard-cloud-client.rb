@@ -3,7 +3,6 @@ module EY
   end
 end
 
-require 'engineyard-cloud-client/ruby_ext'
 require 'engineyard-cloud-client/model_registry'
 require 'engineyard-cloud-client/models'
 require 'engineyard-cloud-client/rest_client_ext'
