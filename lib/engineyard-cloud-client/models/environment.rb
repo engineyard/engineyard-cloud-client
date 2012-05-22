@@ -202,8 +202,12 @@ module EY
       private
 
       def request_instances
-        instances_attrs = api.request("/environments/#{id}/instances")["instances"]
-        load_instances(instances_attrs)
+        if instances_count > 0
+          instances_attrs = api.request("/environments/#{id}/instances")["instances"]
+          load_instances(instances_attrs)
+        else
+          []
+        end
       end
 
       def load_instances(instances_attrs)
