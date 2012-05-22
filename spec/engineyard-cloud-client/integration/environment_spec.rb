@@ -12,6 +12,18 @@ describe EY::CloudClient::Environment do
       envs = EY::CloudClient::Environment.all(api)
       envs.size.should == 3
       envs.map(&:name).should =~ %w[giblets bakon beef]
+      envs.map(&:username).should =~ %w[turkey ham hamburger]
+      with_instances = envs.select {|env| env.instances_count > 0 }
+      with_instances.size.should == 1
+      with_instances.first.instances.map(&:amazon_id).should == ['i-ddbbdd92']
+    end
+
+    it "includes apps in environments" do
+      api = scenario_cloud_client "One App Many Envs"
+      envs = EY::CloudClient::Environment.all(api)
+      envs.map do |env|
+        env.apps.first && env.apps.first.name
+      end.should == ['rails232app', 'rails232app', nil] # 2 envs with the same app, 1 without
     end
   end
 
