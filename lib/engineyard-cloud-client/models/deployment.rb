@@ -47,6 +47,7 @@ module EY
       alias deployed_by= user_name=
 
       def config
+        return {} unless deployed_by # not started yet so not all info is here
         @config ||= {'deployed_by' => deployed_by}.merge(extra_config)
       end
 

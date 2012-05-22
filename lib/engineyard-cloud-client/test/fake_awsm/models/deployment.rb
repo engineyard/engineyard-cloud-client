@@ -11,13 +11,16 @@ class Deployment
   property :migrate_command,    String
   property :ref,                String
   property :successful,         Boolean
-  property :user_name,          String
   property :output,             Text
 
   belongs_to :app_environment
 
   def inspect
     "#<Deployment app_environment:#{app_environment.inspect}>"
+  end
+
+  def user_name
+    app_environment.app.account.user.name
   end
 
   # normally a property, but we don't have the code to find this so just pretend
