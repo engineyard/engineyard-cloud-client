@@ -121,7 +121,7 @@ class FakeAwsm < Sinatra::Base
     {
       "logs" => [
         {
-          "id" => params['env_id'].to_i,
+          "id" => 'i-12345678',
           "role" => "app_master",
           "main" => "MAIN LOG OUTPUT",
           "custom" => "CUSTOM LOG OUTPUT"

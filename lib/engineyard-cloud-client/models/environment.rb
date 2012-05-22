@@ -1,5 +1,6 @@
 require 'engineyard-cloud-client/models'
 require 'engineyard-cloud-client/errors'
+require 'tempfile'
 
 module EY
   class CloudClient
@@ -137,30 +138,24 @@ module EY
         bridge
       end
 
-      def rebuild
+      def update
         api.request("/environments/#{id}/update_instances", :method => :put)
+        true # raises on failure
       end
+      alias rebuild update
 
       def run_custom_recipes
         api.request("/environments/#{id}/run_custom_recipes", :method => :put)
+        true
       end
 
       def download_recipes
-        if File.exist?('cookbooks')
-          raise EY::CloudClient::Error, "Could not download, cookbooks already exists"
-        end
-
-        require 'tempfile'
         tmp = Tempfile.new("recipes")
-        tmp.write(api.request("/environments/#{id}/recipes"))
+        data = api.request("/environments/#{id}/recipes")
+        tmp.write(data)
         tmp.flush
         tmp.close
-
-        cmd = "tar xzf '#{tmp.path}' cookbooks"
-
-        unless system(cmd)
-          raise EY::CloudClient::Error, "Could not unarchive recipes.\nCommand `#{cmd}` exited with an error."
-        end
+        tmp
       end
 
       def upload_recipes_at_path(recipes_path)
@@ -172,27 +167,14 @@ module EY
         end
       end
 
-      def tar_and_upload_recipes_in_cookbooks_dir
-        require 'tempfile'
-        unless File.exist?("cookbooks")
-          raise EY::CloudClient::Error, "Could not find chef recipes. Please run from the root of your recipes repo."
-        end
-
-        recipes_file = Tempfile.new("recipes")
-        cmd = "tar czf '#{recipes_file.path}' cookbooks/"
-
-        unless system(cmd)
-          raise EY::CloudClient::Error, "Could not archive recipes.\nCommand `#{cmd}` exited with an error."
-        end
-
-        upload_recipes(recipes_file)
-      end
-
+      # Expects a File object opened for binary reading.
+      # i.e. File.open(path, 'rb')
       def upload_recipes(file_to_upload)
         api.request("/environments/#{id}/recipes", {
           :method => :post,
           :params => {:file => file_to_upload}
         })
+        true
       end
 
       def shorten_name_for(app)
