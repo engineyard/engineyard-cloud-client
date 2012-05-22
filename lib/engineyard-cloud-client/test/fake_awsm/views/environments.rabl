@@ -3,9 +3,8 @@ attributes :id, :ssh_username, :name, :instances_count, :app_server_stack_name, 
 child :account do
   attributes :id, :name
 end
-child :apps do
-  attributes :id, :name, :repository_uri, :app_type_id
-  child :account do
-    attributes :id, :name
+node :apps do |m|
+  m.apps.map do |app|
+    partial('base_app', :object => app, :root => nil)
   end
 end

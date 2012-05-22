@@ -34,6 +34,13 @@ class FakeAwsm < Sinatra::Base
   end
 
   before do
+    if env['PATH_INFO'] =~ %r#/api/v2#
+      user_agent = env['HTTP_USER_AGENT']
+      unless user_agent =~ %r#^EngineYardCloudClient/\d#
+        $stderr.puts 'No user agent header, expected EngineYardCloudClient/'
+        halt 400, 'No user agent header, expected EngineYardCloudClient/'
+      end
+    end
     content_type "application/json"
     token = request.env['HTTP_X_EY_CLOUD_TOKEN']
     if token
@@ -85,7 +92,6 @@ class FakeAwsm < Sinatra::Base
   end
 
   get "/api/v2/apps" do
-    raise('No user agent header') unless env['HTTP_USER_AGENT'] =~ %r#^EngineYardCloudClient/#
     @apps = @user.accounts.apps
     render :rabl, :apps, :format => "json"
   end
