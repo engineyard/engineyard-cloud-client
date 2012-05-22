@@ -35,4 +35,20 @@ describe EY::CloudClient::AppEnvironment do
     end
   end
 
+  describe "model" do
+    before do
+      api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      result = EY::CloudClient::AppEnvironment.resolve(api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
+      result.should be_one_match
+      @app_env = result.matches.first
+    end
+
+    it "supplies methods to easily access names and attributes" do
+      @app_env.account_name.should == 'main'
+      @app_env.app_name.should == 'rails232app'
+      @app_env.environment_name.should == 'giblets'
+      @app_env.hierarchy_name.should == 'main/rails232app/giblets'
+      @app_env.repository_uri.should == 'user@git.host:path/to/repo.git'
+    end
+  end
 end

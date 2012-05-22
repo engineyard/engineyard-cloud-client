@@ -63,7 +63,7 @@ module EY
         app.repository_uri
       end
 
-      def to_hierarchy_str
+      def hierarchy_name
         [account_name, app_name, environment_name].join('/')
       end
 
@@ -73,10 +73,6 @@ module EY
 
       def new_deployment(attrs)
         Deployment.from_hash(api, attrs.merge(:app_environment => self))
-      end
-
-      def short_environment_name
-        environment.name.gsub(/^#{Regexp.quote(app.name)}_/, '')
       end
 
     end
