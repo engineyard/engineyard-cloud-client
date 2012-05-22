@@ -6,21 +6,11 @@
 
 ## v1.0.1 (2012-05-22)
 
-  *
+  * Includes fixes for deployment test harness used by this gem and engineyard gem
 
 ## v1.0.0 (2012-05-22)
 
-  *
-
-## v0.1.4 (2012-05-18)
-
-  *
-
-## v0.1.2 (2012-05-17)
-
-  *
-
-## v0.1.2 (2012-05-17)
-
+  * First attempt at a real release.
+  * Provides all the functionality that is needed for engineyard gem to operate.
   * Like Torchwood, The Colbert Report, and The Cleveland Show, start CloudClient's new life as a spin-off.
 
