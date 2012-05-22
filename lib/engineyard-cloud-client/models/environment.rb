@@ -214,10 +214,6 @@ module EY
         Instance.from_array(api, instances_attrs, 'environment' => self)
       end
 
-      def no_migrate?(deploy_options)
-        deploy_options.key?('migrate') && deploy_options['migrate'] == false
-      end
-
       # attrs["cluster_configuration"]["cluster"] can be 'single', 'cluster', or 'custom'
       # attrs["cluster_configuration"]["ip"] can be
       #   * 'host' (amazon public hostname)
