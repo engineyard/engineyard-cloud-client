@@ -8,7 +8,7 @@ module EY
                                       :username, :app_server_stack_name,
                                       :load_balancer_ip_address
                                      )
-      attr_accessor :ignore_bad_bridge, :apps, :account
+      attr_accessor :apps, :account
 
       def attributes=(attrs)
         account_attrs    = attrs.delete('account')
@@ -129,7 +129,7 @@ module EY
         @bridge ||= instances.detect { |inst| inst.bridge? }
       end
 
-      def bridge!
+      def bridge!(ignore_bad_bridge = false)
         if bridge.nil?
           raise NoBridgeError.new(name)
         elsif !ignore_bad_bridge && bridge.status != "running"

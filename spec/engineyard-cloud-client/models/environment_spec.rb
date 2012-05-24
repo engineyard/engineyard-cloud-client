@@ -261,9 +261,9 @@ describe EY::CloudClient::Environment do
 
     it "returns the bridge if told to ignore the bridge being in a non-running state" do
       env = make_env_with_bridge("status" => "error")
-      env.ignore_bad_bridge = true
-      env.bridge!.should_not be_nil
-      env.bridge!.id.should == 44206
+      ignore_bad_bridge = true
+      env.bridge!(ignore_bad_bridge).should_not be_nil
+      env.bridge!(ignore_bad_bridge).id.should == 44206
     end
 
     it "raises an error if the bridge has fallen down" do
