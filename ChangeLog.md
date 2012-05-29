@@ -4,6 +4,10 @@
 
   *
 
+## v1.0.2 (2012-05-29)
+
+  *
+
 ## v1.0.1 (2012-05-22)
 
   * Includes fixes for deployment test harness used by this gem and engineyard gem
