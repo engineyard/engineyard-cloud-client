@@ -127,7 +127,7 @@ module EY
         data = ''
       elsif resp.headers[:content_type] =~ /application\/json/
         begin
-          data = MultiJson.decode(resp.body)
+          data = MultiJson.load(resp.body)
           ui.debug("Response", "\n" + data.pretty_inspect)
         rescue MultiJson::DecodeError
           ui.debug("Raw response", resp.body)

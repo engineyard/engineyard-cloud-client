@@ -16,7 +16,7 @@ module EY::CloudClient::Test
 
     def self.load_scenarios
       response = ::RestClient.get(EY::CloudClient::Test::FakeAwsm.uri.sub(/\/?$/,'/scenarios'))
-      data = MultiJson.decode(response)
+      data = MultiJson.load(response)
       data['scenarios'].inject({}) do |hsh, scenario|
         hsh[scenario['name']] = new(scenario)
         hsh
