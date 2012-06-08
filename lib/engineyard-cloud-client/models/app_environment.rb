@@ -27,18 +27,6 @@ module EY
         raise ArgumentError, 'AppEnvironment created without environment!' unless environment
       end
 
-      def set_app(app_or_hash)
-        self.app = App.from_hash(api, app_or_hash)
-        app.add_app_environment(self)
-        app
-      end
-
-      def set_environment(env_or_hash)
-        self.environment = Environment.from_hash(api, env_or_hash)
-        environment.add_app_environment(self)
-        environment
-      end
-
       def attributes=(attrs)
         app_attrs         = attrs.delete('app')
         environment_attrs = attrs.delete('environment')
@@ -73,6 +61,20 @@ module EY
 
       def new_deployment(attrs)
         Deployment.from_hash(api, attrs.merge(:app_environment => self))
+      end
+
+      protected
+
+      def set_app(app_or_hash)
+        self.app = App.from_hash(api, app_or_hash)
+        app.add_app_environment(self)
+        app
+      end
+
+      def set_environment(env_or_hash)
+        self.environment = Environment.from_hash(api, env_or_hash)
+        environment.add_app_environment(self)
+        environment
       end
 
     end

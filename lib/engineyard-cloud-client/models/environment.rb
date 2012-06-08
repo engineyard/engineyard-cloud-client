@@ -8,59 +8,6 @@ module EY
                                       :username, :app_server_stack_name,
                                       :load_balancer_ip_address
                                      )
-      attr_accessor :apps, :account
-
-      def attributes=(attrs)
-        account_attrs    = attrs.delete('account')
-        apps_attrs       = attrs.delete('apps')
-        instances_attrs  = attrs.delete('instances')
-
-        super
-
-        set_account   account_attrs   if account_attrs
-        set_apps      apps_attrs      if apps_attrs
-        set_instances instances_attrs if instances_attrs
-      end
-
-      def add_app_environment(app_env)
-        @app_environments ||= []
-        existing_app_env = @app_environments.detect { |ae| app_env.environment == ae.environment }
-        unless existing_app_env
-          @app_environments << app_env
-        end
-        existing_app_env || app_env
-      end
-
-      def app_environments
-        @app_environments ||= []
-      end
-
-      def set_account(account_attrs)
-        @account = Account.from_hash(api, account_attrs)
-        @account.add_environment(self)
-        @account
-      end
-
-      # Creating an AppEnvironment will come back and call add_app_environment
-      # (above) to associate this model with the AppEnvironment. (that's why we
-      # don't save anything here.)
-      def set_apps(apps_attrs)
-        (apps_attrs || []).each do |app|
-          AppEnvironment.from_hash(api, {'app' => app, 'environment' => self})
-        end
-      end
-
-      def apps
-        app_environments.map { |app_env| app_env.app }
-      end
-
-      def set_instances(instances_attrs)
-        @instances = load_instances(instances_attrs)
-      end
-
-      def instances
-        @instances ||= request_instances
-      end
 
       # Return list of all Environments linked to all current user's accounts
       def self.all(api)
@@ -107,6 +54,40 @@ module EY
         unpack_cluster_configuration(params, cluster_configuration)
         response = api.request("/apps/#{app.id}/environments", :method => :post, :params => params)
         self.from_hash(api, response['environment'])
+      end
+      attr_accessor :apps, :account
+
+      def attributes=(attrs)
+        account_attrs    = attrs.delete('account')
+        apps_attrs       = attrs.delete('apps')
+        instances_attrs  = attrs.delete('instances')
+
+        super
+
+        set_account   account_attrs   if account_attrs
+        set_apps      apps_attrs      if apps_attrs
+        set_instances instances_attrs if instances_attrs
+      end
+
+      def add_app_environment(app_env)
+        @app_environments ||= []
+        existing_app_env = @app_environments.detect { |ae| app_env.environment == ae.environment }
+        unless existing_app_env
+          @app_environments << app_env
+        end
+        existing_app_env || app_env
+      end
+
+      def app_environments
+        @app_environments ||= []
+      end
+
+      def apps
+        app_environments.map { |app_env| app_env.app }
+      end
+
+      def instances
+        @instances ||= request_instances
       end
 
       def account_name
@@ -172,7 +153,26 @@ module EY
         name.gsub(/^#{Regexp.quote(app.name)}_/, '')
       end
 
-      private
+      protected
+
+      def set_account(account_attrs)
+        @account = Account.from_hash(api, account_attrs)
+        @account.add_environment(self)
+        @account
+      end
+
+      # Creating an AppEnvironment will come back and call add_app_environment
+      # (above) to associate this model with the AppEnvironment. (that's why we
+      # don't save anything here.)
+      def set_apps(apps_attrs)
+        (apps_attrs || []).each do |app|
+          AppEnvironment.from_hash(api, {'app' => app, 'environment' => self})
+        end
+      end
+
+      def set_instances(instances_attrs)
+        @instances = load_instances(instances_attrs)
+      end
 
       def request_instances
         if instances_count > 0
