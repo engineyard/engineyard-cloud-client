@@ -1,6 +1,6 @@
 require 'engineyard-cloud-client/models'
+require 'engineyard-cloud-client/models/recipes'
 require 'engineyard-cloud-client/errors'
-require 'tempfile'
 
 module EY
   class CloudClient
@@ -144,37 +144,28 @@ module EY
       end
       alias rebuild update
 
+      def recipes
+        Recipes.new(api, self)
+      end
+
+      # See Recipes#run
       def run_custom_recipes
-        api.request("/environments/#{id}/run_custom_recipes", :method => :put)
-        true
+        recipes.run
       end
 
+      # See Recipes#download
       def download_recipes
-        tmp = Tempfile.new("recipes")
-        data = api.request("/environments/#{id}/recipes")
-        tmp.write(data)
-        tmp.flush
-        tmp.close
-        tmp
+        recipes.download
       end
 
+      # See Recipes#upload_path
       def upload_recipes_at_path(recipes_path)
-        recipes_path = Pathname.new(recipes_path)
-        if recipes_path.exist?
-          upload_recipes recipes_path.open('rb')
-        else
-          raise EY::CloudClient::Error, "Recipes file not found: #{recipes_path}"
-        end
+        recipes.upload_path(recipes_path)
       end
 
-      # Expects a File object opened for binary reading.
-      # i.e. File.open(path, 'rb')
+      # See Recipes#upload
       def upload_recipes(file_to_upload)
-        api.request("/environments/#{id}/recipes", {
-          :method => :post,
-          :params => {:file => file_to_upload}
-        })
-        true
+        recipes.upload(file_to_upload)
       end
 
       def shorten_name_for(app)
