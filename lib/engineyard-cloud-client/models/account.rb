@@ -5,7 +5,7 @@ module EY
     class Account < ApiStruct.new(:id, :name)
 
       def self.all(api)
-        self.from_array(api, api.request('/accounts')["accounts"])
+        self.from_array(api, api.get("/accounts")["accounts"])
       end
 
       def add_app(app)

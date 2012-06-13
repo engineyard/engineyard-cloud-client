@@ -13,7 +13,7 @@ module EY
 
       # Return list of all Environments linked to all current user's accounts
       def self.all(api)
-        self.from_array(api, api.request('/environments?no_instances=true')["environments"])
+        self.from_array(api, api.get("/environments", "no_instances" => "true")["environments"])
       end
 
       # Return a constrained list of environments given a set of constraints like:
@@ -26,7 +26,7 @@ module EY
       def self.resolve(api, constraints)
         clean_constraints = constraints.reject { |k,v| v.nil? }
         params = {'constraints' => clean_constraints}
-        response = api.request("/environments/resolve", :method => :get, :params => params)['resolver']
+        response = api.get("/environments/resolve", params)['resolver']
         matches = from_array(api, response['matches'])
         ResolverResult.new(api, matches, response['errors'], response['suggestions'])
       end
@@ -54,7 +54,7 @@ module EY
 
         params = {"environment" => attrs.dup}
         unpack_cluster_configuration(params, cluster_configuration)
-        response = api.request("/apps/#{app.id}/environments", :method => :post, :params => params)
+        response = api.post("/apps/#{app.id}/environments", params)
         self.from_hash(api, response['environment'])
       end
       attr_accessor :apps, :account
@@ -101,7 +101,7 @@ module EY
       end
 
       def logs
-        Log.from_array(api, api.request("/environments/#{id}/logs", :method => :get)["logs"])
+        Log.from_array(api, api.get("/environments/#{id}/logs")["logs"])
       end
 
       def deploy_to_instances
@@ -116,13 +116,13 @@ module EY
         if bridge.nil?
           raise NoBridgeError.new(name)
         elsif !ignore_bad_bridge && bridge.status != "running"
-          raise BadBridgeStatusError.new(bridge.status, EY::CloudClient.endpoint)
+          raise BadBridgeStatusError.new(bridge.status, api.endpoint)
         end
         bridge
       end
 
       def update
-        api.request("/environments/#{id}/update_instances", :method => :put)
+        api.put("/environments/#{id}/update_instances")
         true # raises on failure
       end
       alias rebuild update
@@ -180,7 +180,7 @@ module EY
         if instances_count.zero?
           []
         else
-          instances_attrs = api.request("/environments/#{id}/instances")["instances"]
+          instances_attrs = api.get("/environments/#{id}/instances")["instances"]
           load_instances(instances_attrs)
         end
       end

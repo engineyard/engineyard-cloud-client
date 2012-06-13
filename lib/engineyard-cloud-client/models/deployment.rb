@@ -14,7 +14,7 @@ module EY
 
       def self.get(api, app_environment, id)
         uri = api_root(app_environment.app.id, app_environment.environment.id) + "/#{id}"
-        response = api.request(uri, :method => :get)
+        response = api.get(uri)
         load_from_response api, app_environment, response
       rescue EY::CloudClient::ResourceNotFound
         nil
@@ -95,11 +95,11 @@ module EY
       private
 
       def post_to_api(params)
-        update_with_response api.request(collection_uri, :method => :post, :params => {:deployment => params})
+        update_with_response api.post(collection_uri, 'deployment' => params)
       end
 
       def put_to_api(params)
-        update_with_response api.request(member_uri("/finished"), :method => :put, :params => {:deployment => params})
+        update_with_response api.put(member_uri("/finished"), 'deployment' => params)
       end
 
       def collection_uri

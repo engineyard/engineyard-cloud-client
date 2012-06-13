@@ -36,9 +36,10 @@ class FakeAwsm < Sinatra::Base
   before do
     if env['PATH_INFO'] =~ %r#/api/v2#
       user_agent = env['HTTP_USER_AGENT']
-      unless user_agent =~ %r#^EngineYardCloudClient/\d#
-        $stderr.puts 'No user agent header, expected EngineYardCloudClient/'
-        halt 400, 'No user agent header, expected EngineYardCloudClient/'
+      unless user_agent =~ %r#EngineYardCloudClient/\d#
+        msg = "No user agent header, expected EngineYardCloudClient/ got #{user_agent.inspect}"
+        $stderr.puts msg
+        halt 400, msg
       end
     end
     content_type "application/json"

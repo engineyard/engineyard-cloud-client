@@ -9,7 +9,7 @@ module EY
 
       # Return list of all Apps linked to all current user's accounts
       def self.all(api)
-        self.from_array(api, api.request('/apps?no_instances=true')["apps"])
+        self.from_array(api, api.get("/apps", 'no_instances' => 'true')["apps"])
       end
 
       # An everything-you-need helper to create an App
@@ -32,7 +32,7 @@ module EY
         raise EY::CloudClient::AttributeRequiredError.new("name") unless params["name"]
         raise EY::CloudClient::AttributeRequiredError.new("repository_uri") unless params["repository_uri"]
         raise EY::CloudClient::AttributeRequiredError.new("app_type_id") unless params["app_type_id"]
-        response = api.request("/accounts/#{account.id}/apps", :method => :post, :params => {"app" => params})
+        response = api.post("/accounts/#{account.id}/apps", "app" => params)
         from_hash(api, response['app'])
       end
 

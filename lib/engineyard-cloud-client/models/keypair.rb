@@ -5,7 +5,7 @@ module EY
     class Keypair < ApiStruct.new(:id, :name, :public_key)
 
       def self.all(api)
-        self.from_array(api, api.request('/keypairs')["keypairs"])
+        self.from_array(api, api.get("/keypairs")["keypairs"])
       end
 
       # Create a Keypair with your SSH public key so that you can access your Instances
@@ -24,8 +24,8 @@ module EY
         params = attrs.dup # no default fields
         raise EY::CloudClient::AttributeRequiredError.new("name") unless params["name"]
         raise EY::CloudClient::AttributeRequiredError.new("public_key") unless params["public_key"]
-        response = api.request("/keypairs", :method => :post, :params => {"keypair" => params})
-        self.from_hash(api, response['keypair'])
+        response = api.post("/keypairs", "keypair" => params)['keypair']
+        self.from_hash(api, response)
       end
     end
   end

@@ -3,7 +3,6 @@ require 'spec_helper'
 describe EY::CloudClient::User do
   before do
     FakeWeb.allow_net_connect = true
-    EY::CloudClient.endpoint = EY::CloudClient::Test::FakeAwsm.uri
   end
 
   describe ".all" do

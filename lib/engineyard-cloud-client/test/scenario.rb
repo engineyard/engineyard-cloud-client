@@ -32,7 +32,7 @@ module EY::CloudClient::Test
     end
 
     def cloud_client
-      EY::CloudClient.new(@api_token)
+      EY::CloudClient.new(:endpoint => EY::CloudClient::Test::FakeAwsm.uri, :token => @api_token)
     end
 
     def inspect

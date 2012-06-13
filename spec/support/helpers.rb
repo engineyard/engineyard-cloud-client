@@ -2,7 +2,7 @@ require 'rest_client'
 
 module SpecHelpers
   def cloud_client(token = 'asdf')
-    @cloud_client ||= EY::CloudClient.new(token)
+    @cloud_client ||= EY::CloudClient.new(:token => token)
   end
 
   def scenario_cloud_client(scenario)

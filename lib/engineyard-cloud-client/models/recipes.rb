@@ -12,13 +12,13 @@ module EY
       end
 
       def run
-        api.request("/environments/#{environment.id}/run_custom_recipes", :method => :put)
+        api.put("/environments/#{environment.id}/run_custom_recipes")
         true
       end
 
       def download
         tmp = Tempfile.new("recipes")
-        data = api.request("/environments/#{environment.id}/recipes")
+        data = api.get("/environments/#{environment.id}/recipes")
         tmp.write(data)
         tmp.flush
         tmp.close
@@ -37,10 +37,7 @@ module EY
       # Expects a File object opened for binary reading.
       # i.e. upload(File.open(recipes_path, 'rb'))
       def upload(file_to_upload)
-        api.request("/environments/#{environment.id}/recipes", {
-          :method => :post,
-          :params => {:file => file_to_upload}
-        })
+        api.post("/environments/#{environment.id}/recipes", :file => file_to_upload)
         true
       end
 

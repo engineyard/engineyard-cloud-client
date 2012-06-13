@@ -2,46 +2,32 @@ require 'spec_helper'
 
 describe EY::CloudClient do
   it "holds an api token" do
-    EY::CloudClient.new('asdf').token.should == "asdf"
+    EY::CloudClient.new(:token => 'asdf').connection.token.should == "asdf"
   end
 
-  describe ".endpoint" do
-    after do
-      EY::CloudClient.default_endpoint!
-    end
-
-    it "defaults to production EY Cloud" do
-      EY::CloudClient.endpoint.should == URI.parse('https://cloud.engineyard.com')
-    end
-
-    it "accepts a valid endpoint" do
-      EY::CloudClient.endpoint = "http://fake.local/"
-      EY::CloudClient.endpoint.should == URI.parse('http://fake.local')
-    end
-
-    it "uses the endpoint to make requests" do
-      FakeWeb.register_uri(:post, "http://fake.local/api/v2/authenticate", :body => %|{"api_token": "fake.localtoken"}|, :content_type => 'application/json')
-
-      EY::CloudClient.endpoint = "http://fake.local/"
-      EY::CloudClient.authenticate("a@b.com", "foo").should == "fake.localtoken"
-    end
-
-    it "raises on an invalid endpoint" do
-      lambda { EY::CloudClient.endpoint = "non/absolute" }.should raise_error(EY::CloudClient::BadEndpointError)
-    end
+  it "uses production EY Cloud by default" do
+    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :body => %|{"api_token": "cloudtoken"}|, :content_type => 'application/json')
+    client = EY::CloudClient.new
+    client.authenticate!("a@b.com", "foo")
+    client.connection.token.should == "cloudtoken"
   end
 
-  it "authenticates with valid credentials and returns the api token" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :body => %|{"api_token": "asdf"}|, :content_type => 'application/json')
+  it "uses a custom endpoint to make requests" do
+    FakeWeb.register_uri(:post, "http://fake.local/api/v2/authenticate", :body => %|{"api_token": "fake.localtoken"}|, :content_type => 'application/json')
+    client = EY::CloudClient.new(:endpoint => "http://fake.local/")
+    client.authenticate!("a@b.com", "foo")
+    client.connection.token.should == "fake.localtoken"
+  end
 
-    EY::CloudClient.authenticate("a@b.com", "foo").should == "asdf"
+  it "raises on an invalid endpoint" do
+    lambda { EY::CloudClient.new(:endpoint => "non/absolute") }.should raise_error(EY::CloudClient::BadEndpointError)
   end
 
   it "raises InvalidCredentials when the credentials are invalid" do
     FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 401, :content_type => 'application/json')
 
     lambda {
-      EY::CloudClient.authenticate("a@b.com", "foo")
+      EY::CloudClient.new.authenticate!("a@b.com", "foo")
     }.should raise_error(EY::CloudClient::InvalidCredentials)
   end
 
@@ -49,7 +35,7 @@ describe EY::CloudClient do
     FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 502, :content_type => 'text/html')
 
     lambda {
-      EY::CloudClient.authenticate("a@b.com", "foo")
+      EY::CloudClient.new.authenticate!("a@b.com", "foo")
     }.should raise_error(EY::CloudClient::RequestFailed, /API is temporarily unavailable/)
   end
 end

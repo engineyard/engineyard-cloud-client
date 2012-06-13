@@ -44,7 +44,4 @@ RSpec.configure do |config|
     FakeWeb.allow_net_connect = false
   end
 
-  config.before(:each) do
-    EY::CloudClient.default_endpoint!
-  end
 end
