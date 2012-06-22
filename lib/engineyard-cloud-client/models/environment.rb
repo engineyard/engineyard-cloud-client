@@ -4,7 +4,9 @@ require 'engineyard-cloud-client/errors'
 
 module EY
   class CloudClient
-    class Environment < ApiStruct.new(:id, :name, :framework_env, :instances_count,
+    class Environment < ApiStruct.new(:id, :name, :framework_env,
+                                      :instances_count,
+                                      :instance_status,
                                       :username, :app_server_stack_name,
                                       :load_balancer_ip_address
                                      )
