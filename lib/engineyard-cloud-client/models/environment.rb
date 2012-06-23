@@ -18,9 +18,9 @@ module EY
 
       # Return a constrained list of environments given a set of constraints like:
       #
-      # * app_name
-      # * account_name
-      # * environment_name
+      # * app_name:  app name full or partial match string
+      # * account_name:  account name full or partial match string
+      # * environment_name:  environment name full or partial match string
       # * remotes:  An array of git remote URIs
       #
       def self.resolve(api, constraints)
