@@ -4,6 +4,7 @@ RSpec::Core::RakeTask.new do |t|
   t.pattern = 'spec/**/*_spec.rb'
 end
 
+desc "Run specs with coverage"
 task :coverage => [:coverage_env, :spec]
 
 task :coverage_env do
