@@ -1,12 +1,8 @@
 require 'rest_client'
 
 module SpecHelpers
-  def test_ui
-    @test_ui ||= EY::CloudClient::Test::UI.new
-  end
-
-  def cloud_client(token = 'asdf', ui = test_ui)
-    @cloud_client ||= EY::CloudClient.new(token, ui)
+  def cloud_client(token = 'asdf')
+    @cloud_client ||= EY::CloudClient.new(token)
   end
 
   def scenario_cloud_client(scenario)

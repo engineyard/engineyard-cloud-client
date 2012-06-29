@@ -2,11 +2,7 @@ require 'spec_helper'
 
 describe EY::CloudClient do
   it "holds an api token" do
-    EY::CloudClient.new('asdf', test_ui).token.should == "asdf"
-  end
-
-  it "holds a UI" do
-    EY::CloudClient.new('asdf', test_ui).ui.should == test_ui
+    EY::CloudClient.new('asdf').token.should == "asdf"
   end
 
   describe ".endpoint" do
@@ -27,7 +23,7 @@ describe EY::CloudClient do
       FakeWeb.register_uri(:post, "http://fake.local/api/v2/authenticate", :body => %|{"api_token": "fake.localtoken"}|, :content_type => 'application/json')
 
       EY::CloudClient.endpoint = "http://fake.local/"
-      EY::CloudClient.authenticate("a@b.com", "foo", test_ui).should == "fake.localtoken"
+      EY::CloudClient.authenticate("a@b.com", "foo").should == "fake.localtoken"
     end
 
     it "raises on an invalid endpoint" do
@@ -38,14 +34,14 @@ describe EY::CloudClient do
   it "authenticates with valid credentials and returns the api token" do
     FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :body => %|{"api_token": "asdf"}|, :content_type => 'application/json')
 
-    EY::CloudClient.authenticate("a@b.com", "foo", test_ui).should == "asdf"
+    EY::CloudClient.authenticate("a@b.com", "foo").should == "asdf"
   end
 
   it "raises InvalidCredentials when the credentials are invalid" do
     FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 401, :content_type => 'application/json')
 
     lambda {
-      EY::CloudClient.authenticate("a@b.com", "foo", test_ui)
+      EY::CloudClient.authenticate("a@b.com", "foo")
     }.should raise_error(EY::CloudClient::InvalidCredentials)
   end
 
@@ -53,7 +49,7 @@ describe EY::CloudClient do
     FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 502, :content_type => 'text/html')
 
     lambda {
-      EY::CloudClient.authenticate("a@b.com", "foo", test_ui)
+      EY::CloudClient.authenticate("a@b.com", "foo")
     }.should raise_error(EY::CloudClient::RequestFailed, /API is temporarily unavailable/)
   end
 end

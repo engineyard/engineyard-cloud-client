@@ -15,7 +15,7 @@ require 'pp'
 module EY
   class CloudClient
     attr_reader :token, :registry
-    attr_accessor :ui
+    attr_accessor :output
 
     USER_AGENT_STRING = "EngineYardCloudClient/#{EY::CloudClient::VERSION}"
 
@@ -36,9 +36,9 @@ module EY
     end
     default_endpoint!
 
-    def initialize(token, ui)
+    def initialize(token, output=$stdout)
       self.token = token
-      self.ui = ui
+      self.output = output
     end
 
     def ==(other)
@@ -59,8 +59,7 @@ module EY
     def request(url, opts={})
       opts[:headers] ||= {}
       opts[:headers]["X-EY-Cloud-Token"] = token
-      ui.debug("Token", token)
-      self.class.request(url, ui, opts)
+      self.class.request(url, output, opts)
     end
 
     def resolve_environments(constraints)
@@ -89,7 +88,7 @@ module EY
       EY::CloudClient::User.from_hash(self, request('/current_user')['user'])
     end
 
-    def self.request(path, ui, opts={})
+    def self.request(path, output = $stdout, opts={})
       url = self.endpoint + "api/v2#{path}"
       method = (opts.delete(:method) || 'get').to_s.downcase.to_sym
       params = opts.delete(:params) || {}
@@ -98,8 +97,9 @@ module EY
       headers["User-Agent"] = USER_AGENT_STRING
 
       begin
-        ui.debug("Request", "#{method.to_s.upcase} #{url}")
-        ui.debug("Params", params.inspect)
+        output << debug_msg("Request", "#{method.to_s.upcase} #{url}")
+        output << debug_msg("Headers", headers)
+        output << debug_msg("Params", params)
         case method
         when :get, :delete, :head
           unless params.empty?
@@ -128,9 +128,9 @@ module EY
       elsif resp.headers[:content_type] =~ /application\/json/
         begin
           data = MultiJson.load(resp.body)
-          ui.debug("Response", "\n" + data.pretty_inspect)
+          output << debug_msg("Response", data)
         rescue MultiJson::DecodeError
-          ui.debug("Raw response", resp.body)
+          output << debug_msg("Raw response", resp.body)
           raise RequestFailed, "Response was not valid JSON."
         end
       else
@@ -140,8 +140,25 @@ module EY
       data
     end
 
-    def self.authenticate(email, password, ui)
-      request("/authenticate", ui, { :method => "post", :params => { :email => email, :password => password }})["api_token"]
+    def self.authenticate(email, password, output=$stdout)
+      request("/authenticate", output, { :method => "post", :params => { :email => email, :password => password }})["api_token"]
+    end
+
+    def debug_msg(*a)
+      self.class.debug_msg(*a)
+    end
+
+    def self.debug_msg(name, value)
+      return "" unless ENV['DEBUG']
+
+      indent = 12
+      unless String === value
+        value = value.pretty_inspect.rstrip                 # remove trailing whitespace
+        if value.index("\n")                                # if the inspect is multi-line
+          value.gsub!(/[\r\n]./, "\n" + ' ' * (indent + 2)) # indent it
+        end
+      end
+      "#{name.to_s.rjust(indent)}  #{value.rstrip}\n"       # just one newline
     end
 
   end # API

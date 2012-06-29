@@ -27,5 +27,4 @@ Please add the above to your Gemfile.
   ERROR
 end
 
-require 'engineyard-cloud-client/test/ui'
 require 'engineyard-cloud-client/test/scenario'

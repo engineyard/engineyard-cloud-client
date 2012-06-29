@@ -2,7 +2,6 @@ require 'multi_json'
 require 'engineyard-cloud-client/rest_client_ext'
 require 'engineyard-cloud-client/test'
 require 'engineyard-cloud-client/test/fake_awsm'
-require 'engineyard-cloud-client/test/ui'
 
 module EY::CloudClient::Test
   class Scenario
@@ -32,8 +31,8 @@ module EY::CloudClient::Test
       @api_token = options['api_token']
     end
 
-    def cloud_client(ui = EY::CloudClient::Test::UI.new)
-      EY::CloudClient.new(@api_token, ui)
+    def cloud_client
+      EY::CloudClient.new(@api_token)
     end
 
     def inspect
