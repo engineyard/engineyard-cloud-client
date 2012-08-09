@@ -18,7 +18,7 @@ module EY
   class CloudClient
     extend Forwardable
 
-    def_delegators :connection, :head, :get, :post, :put, :delete, :request, :endpoint, :token
+    def_delegators :connection, :head, :get, :post, :put, :delete, :request, :endpoint, :token, :token=, :authenticate!, :authenticated?
 
     attr_reader :connection
 
@@ -29,14 +29,6 @@ module EY
     # See EY::CloudClient::Connection for options.
     def initialize(options={})
       @connection = Connection.new(options)
-    end
-
-    def authenticate!(*a)
-      connection.authenticate!(*a)
-    end
-
-    def authenticated?
-      connection.authenticated?
     end
 
     def ==(other)
