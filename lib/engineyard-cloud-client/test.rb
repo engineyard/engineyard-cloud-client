@@ -15,11 +15,12 @@ rescue LoadError
 engineyard-cloud-client needs the following gems to run in test mode:
 
 group 'engineyard-cloud-client-test' do
-  gem 'dm-core'
+  gem 'dm-core',           '~>1.2.0'
   gem 'dm-migrations'
   gem 'dm-aggregates'
+  gem 'dm-timestamps'
   gem 'dm-sqlite-adapter'
-  gem 'ey_resolver', '~>0.2.1'
+  gem 'ey_resolver',       '~>0.2.1'
   gem 'rabl'
 end
 

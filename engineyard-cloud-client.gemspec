@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('fakeweb-matcher')
   s.add_development_dependency('sinatra')
   s.add_development_dependency('realweb', '~>0.2.2')
-  s.add_development_dependency('dm-core')
+  s.add_development_dependency('dm-core', '~>1.2.0')
   s.add_development_dependency('dm-migrations')
   s.add_development_dependency('dm-aggregates')
   s.add_development_dependency('dm-timestamps')
