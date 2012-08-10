@@ -2,7 +2,7 @@
 
 ## NEXT
 
-  *
+  * Send input\_ref to deployments in the extra config.
 
 ## v1.0.3 (2012-06-13)
 

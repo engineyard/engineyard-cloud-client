@@ -30,7 +30,7 @@ describe EY::CloudClient::AppEnvironment do
 
       deployment.created_at.should_not be_nil
       deployment.finished_at.should be_nil
-      deployment.config.should == {'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
+      deployment.config.should == {'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
       deployment.commit.should =~ /[0-9a-f]{40}/
       deployment.resolved_ref.should_not be_nil
       deployment.out << "Test output"
