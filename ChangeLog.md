@@ -3,6 +3,8 @@
 ## NEXT
 
   * Send input\_ref to deployments in the extra config.
+  * Use Connection object to take over for all api communication, simplifying the CloudClient class.
+  * Interface for creating a CloudClient has changed to support new Connection class.
 
 ## v1.0.3 (2012-06-13)
 
