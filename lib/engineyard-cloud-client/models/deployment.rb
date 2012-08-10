@@ -47,11 +47,11 @@ module EY
       alias deployed_by= user_name=
 
       def created_at
-        super && (@created_at ||= Time.parse(super))
+        @created_at ||= super && Time.parse(super)
       end
 
       def finished_at
-        super && (@finished_at ||= Time.parse(super))
+        @finished_at ||= super && Time.parse(super)
       end
 
       def config
