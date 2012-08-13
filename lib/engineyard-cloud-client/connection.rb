@@ -82,8 +82,6 @@ module EY
         resp = do_request(meth, url, params, headers)
         data = parse_response(resp)
 
-        debug("Response", data)
-
         data
       end
 
@@ -128,7 +126,9 @@ module EY
           ''
         elsif resp.headers[:content_type] =~ /application\/json/
           begin
-            MultiJson.load(resp.body)
+            data = MultiJson.load(resp.body)
+            debug("Response", data)
+            data
           rescue MultiJson::DecodeError
             debug("Response", resp.body)
             raise RequestFailed, "Response was not valid JSON."
