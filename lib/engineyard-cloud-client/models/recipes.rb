@@ -1,4 +1,5 @@
 require 'tempfile'
+require 'pathname'
 require 'engineyard-cloud-client/errors'
 
 module EY

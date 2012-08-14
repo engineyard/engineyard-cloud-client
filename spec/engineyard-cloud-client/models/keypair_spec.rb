@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'engineyard-cloud-client/models/keypair'
 
 describe EY::CloudClient::Keypair do
   describe ".all" do

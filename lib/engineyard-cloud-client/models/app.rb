@@ -1,5 +1,7 @@
+require 'engineyard-cloud-client/models/api_struct'
+require 'engineyard-cloud-client/models/account'
+require 'engineyard-cloud-client/models/app_environment'
 require 'engineyard-cloud-client/errors'
-require 'engineyard-cloud-client/models'
 
 module EY
   class CloudClient

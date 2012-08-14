@@ -1,4 +1,4 @@
-require 'engineyard-cloud-client/models'
+require 'engineyard-cloud-client/models/api_struct'
 
 module EY
   class CloudClient

@@ -1,5 +1,11 @@
-require 'engineyard-cloud-client/models'
+require 'engineyard-cloud-client/models/api_struct'
+require 'engineyard-cloud-client/models/account'
+require 'engineyard-cloud-client/models/app'
+require 'engineyard-cloud-client/models/app_environment'
+require 'engineyard-cloud-client/models/instance'
+require 'engineyard-cloud-client/models/log'
 require 'engineyard-cloud-client/models/recipes'
+require 'engineyard-cloud-client/resolver_result'
 require 'engineyard-cloud-client/errors'
 
 module EY

@@ -1,4 +1,6 @@
+require 'engineyard-cloud-client/version'
 require 'engineyard-cloud-client/rest_client_ext'
+require 'engineyard-cloud-client/errors'
 require 'multi_json'
 require 'uri'
 
