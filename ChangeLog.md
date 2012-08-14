@@ -4,6 +4,10 @@
 
   *
 
+## v1.0.5 (2012-08-14)
+
+  *
+
 ## v1.0.4 (2012-08-14)
 
   * Send input\_ref to deployments in the extra config.
