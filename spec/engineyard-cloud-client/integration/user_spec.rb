@@ -12,4 +12,14 @@ describe EY::CloudClient::User do
     user.accounts.size.should == 1
     user.accounts.first.name.should == 'main'
   end
+
+  it "has keypairs" do
+    api = scenario_cloud_client "User Name"
+    keypair = EY::CloudClient::Keypair.create(api, {
+        "name"       => 'laptop',
+        "public_key" => "ssh-rsa OTHERKEYPAIR"
+    })
+    api.current_user.keypairs.should include(keypair)
+    keypair.destroy
+  end
 end

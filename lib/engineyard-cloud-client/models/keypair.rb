@@ -28,6 +28,10 @@ module EY
         response = api.post("/keypairs", "keypair" => params)['keypair']
         self.from_hash(api, response)
       end
+
+      def destroy
+        api.delete("/keypairs/#{id}")
+      end
     end
   end
 end

@@ -87,6 +87,28 @@ class FakeAwsm < Sinatra::Base
     render :rabl, :user, :format => "json"
   end
 
+  post "/api/v2/keypairs" do
+    @keypair = @user.keypairs.create(params['keypair'])
+    render :rabl, :keypair, :format => "json"
+  end
+
+  get "/api/v2/keypairs" do
+    @keypairs = @user.keypairs
+    render :rabl, :keypairs, :format => "json"
+  end
+
+  delete "/api/v2/keypairs/:id" do
+    keypair = @user.keypairs.get(params['id'])
+    if keypair
+      keypair.destroy
+      status 204
+      ""
+    else
+      status 404
+      return {"message" => "Keypair not found with id #{params['id'].inspect}"}.to_json
+    end
+  end
+
   get "/api/v2/accounts" do
     @accounts = @user.accounts
     render :rabl, :accounts, :format => "json"

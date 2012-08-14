@@ -11,5 +11,6 @@ class User
     :default => lambda { |r, p| File.open('/dev/urandom', 'r') { |fh| fh.read(16).unpack('H*').first }}
 
   has n, :accounts
+  has n, :keypairs
 
 end
