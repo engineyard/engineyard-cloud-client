@@ -206,7 +206,12 @@ class FakeAwsm < Sinatra::Base
   get "/api/v2/apps/:app_id/environments/:environment_id/deployments/last" do
     app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
     @deployment = app_env.deployments.last
-    render :rabl, :deployment, :format => "json"
+    if @deployment
+      render :rabl, :deployment, :format => "json"
+    else
+      status(404)
+      {"message" => "Deployment not found: last"}.to_json
+    end
   end
 
   put "/api/v2/apps/:app_id/environments/:environment_id/deployments/:deployment_id/finished" do
