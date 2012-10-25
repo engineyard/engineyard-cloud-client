@@ -4,7 +4,7 @@ require 'stringio'
 
 module EY
   class CloudClient
-    class Deployment < ApiStruct.new(:id, :app_environment, :created_at, :commit, :finished_at, :migrate_command, :ref, :resolved_ref, :successful, :user_name, :extra_config)
+    class Deployment < ApiStruct.new(:id, :app_environment, :created_at, :commit, :finished_at, :migrate_command, :ref, :resolved_ref, :successful, :user_name, :extra_config, :serverside_version)
       def self.api_root(app_id, environment_id)
         "/apps/#{app_id}/environments/#{environment_id}/deployments"
       end
@@ -61,7 +61,11 @@ module EY
       end
 
       def start
-        params = { :migrate => migrate, :ref => ref }
+        params = {
+          :migrate => migrate,
+          :ref => ref,
+          :serverside_version => serverside_version,
+        }
         params[:migrate_command] = migrate_command if migrate
         post_to_api(params)
       end

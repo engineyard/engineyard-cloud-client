@@ -19,9 +19,11 @@ describe EY::CloudClient::AppEnvironment do
         :migrate         => true,
         :migrate_command => 'rake migrate',
         :extra_config    => {'extra' => 'config'},
+        :serverside_version => '2.0.3',
       })
       deployment.commit.should be_nil
       deployment.resolved_ref.should be_nil
+      deployment.serverside_version.should == '2.0.3'
 
       deployment.created_at.should be_nil
       deployment.finished_at.should be_nil
@@ -46,6 +48,7 @@ describe EY::CloudClient::AppEnvironment do
       found_dep = @app_env.last_deployment
       found_dep.id.should == deployment.id
       found_dep.should be_finished
+      found_dep.serverside_version.should == '2.0.3'
     end
 
     it "returns nil when a not found deployment is requested" do

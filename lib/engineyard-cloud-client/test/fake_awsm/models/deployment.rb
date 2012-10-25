@@ -12,6 +12,7 @@ class Deployment
   property :ref,                String
   property :successful,         Boolean
   property :output,             Text
+  property :serverside_version, String
 
   belongs_to :app_environment
 
