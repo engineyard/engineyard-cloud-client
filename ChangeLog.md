@@ -6,7 +6,7 @@
 
 ## v1.0.7 (2012-10-25)
 
-  *
+  * Send serverside\_version to the deployment API when starting a deploy.
 
 ## v1.0.6 (2012-08-20)
 
