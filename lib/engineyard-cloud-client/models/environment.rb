@@ -102,6 +102,10 @@ module EY
         account && account.name
       end
 
+      def hierarchy_name
+        "#{account_name}/#{name}"
+      end
+
       def ssh_username=(user)
         self.username = user
       end
