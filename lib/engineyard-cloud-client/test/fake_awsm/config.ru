@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'sinatra/base'
-require 'json'
+require 'multi_json'
 require 'rabl'
 require 'gitable'
 require 'ey_resolver'
@@ -33,6 +33,12 @@ class FakeAwsm < Sinatra::Base
     @user = Scenario::Base.new.user
   end
 
+  helpers do
+    def json(data)
+      MultiJson.dump(data)
+    end
+  end
+
   before do
     if env['PATH_INFO'] =~ %r#/api/v2#
       user_agent = env['HTTP_USER_AGENT']
@@ -55,32 +61,18 @@ class FakeAwsm < Sinatra::Base
   end
 
   get "/scenario" do
-    new_scenario = SCENARIOS.detect { |scen| scen.user.name == params[:scenario] }
-    unless new_scenario
+    found_scenario = SCENARIOS.detect { |scen| scen.user.name == params[:scenario] }
+    unless found_scenario
       status(404)
-      return {"ok" => "false", "message" => "wtf is the #{params[:scenario]} scenario?"}.to_json
+      return json({"ok" => "false", "message" => "wtf is the #{params[:scenario]} scenario?"})
     end
-    user = new_scenario.user
-    {
-      "scenario" => {
-        "email"     => user.email,
-        "password"  => user.password,
-        "api_token" => user.api_token,
-      }
-    }.to_json
+    @scenario = found_scenario.user
+    render :rabl, :scenario, :format => "json"
   end
 
   get "/scenarios" do
-    scenarios = SCENARIOS.map do |scen|
-      user = scen.user
-      {
-        :name      => user.name,
-        :email     => user.email,
-        :password  => user.password,
-        :api_token => user.api_token,
-      }
-    end
-    {'scenarios' => scenarios}.to_json
+    @scenarios = SCENARIOS.map { |scen| scen.user }
+    render :rabl, :scenarios, :format => "json"
   end
 
   get "/api/v2/current_user" do
