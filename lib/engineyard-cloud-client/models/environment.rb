@@ -114,8 +114,12 @@ module EY
         Log.from_array(api, api.get("/environments/#{id}/logs")["logs"])
       end
 
+      def provisioned_instances
+        instances.select { |inst| inst.provisioned? }
+      end
+
       def deploy_to_instances
-        instances.select { |inst| inst.has_app_code? }
+        provisioned_instances.select { |inst| inst.has_app_code? }
       end
 
       def bridge
@@ -125,7 +129,7 @@ module EY
       def bridge!(ignore_bad_bridge = false)
         if bridge.nil?
           raise NoBridgeError.new(name)
-        elsif !ignore_bad_bridge && bridge.status != "running"
+        elsif !ignore_bad_bridge && !bridge.running?
           raise BadBridgeStatusError.new(bridge.status, api.endpoint)
         end
         bridge

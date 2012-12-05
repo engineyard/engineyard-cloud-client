@@ -10,6 +10,13 @@ module EY
         !["db_master", "db_slave"].include?(role.to_s)
       end
 
+      def running?
+        status == "running"
+      end
+
+      def provisioned?
+        hostname && role && status != "starting" # not foolproof, but help throw out bad instances
+      end
     end
   end
 end
