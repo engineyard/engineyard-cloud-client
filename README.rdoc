@@ -1,6 +1,29 @@
 = Engine Yard Cloud Client
 
-engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the engineyard gem.
+engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the [engineyard gem](https://github.com/engineyard/engineyard).
+
+== Use at your own risk
+
+At this time, cloud-client is not documented for public use. It was created to
+be used by the engineyard gem with the hopes of eventually providing a public
+api client, but it's still in its infancy.
+
+If you would like to use this gem directly instead of interfacing with the
+engineyard gem, you will likely be on your own. We may be available to answer
+questions about the gem, but the gem itself is not currently a supported public
+interface to Engine Yard Cloud.
+
+This gem accesses API actions that can alter your dashboard and settings. If
+used incorrectly, it could lead to problems. As we work towards making this a
+reliable public client, the interface may change.
+
+If you intend to use this gem, please lock to an exact version and pay close
+attention to newly released versions and changes to the interface.
+
+Please [open github issues](https://github.com/engineyard/engineyard-cloud-client/issues)
+for any problems you encounter.
+
+== Usage
 
 Setup:
 
