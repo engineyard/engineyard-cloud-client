@@ -1,8 +1,8 @@
-= Engine Yard Cloud Client
+# Engine Yard Cloud Client
 
 engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the [engineyard gem](https://github.com/engineyard/engineyard).
 
-== Use at your own risk
+## Use at your own risk
 
 At this time, cloud-client is not documented for public use. It was created to
 be used by the engineyard gem with the hopes of eventually providing a public
@@ -23,7 +23,7 @@ attention to newly released versions and changes to the interface.
 Please [open github issues](https://github.com/engineyard/engineyard-cloud-client/issues)
 for any problems you encounter.
 
-== Usage
+## Usage
 
 Setup:
 
@@ -135,7 +135,7 @@ Instances:
     instance.hostname     # => "ec2-1-2-3-4.compute-1.amazonaws.com"
     instance.public_hostname # => "ec2-1-2-3-4.compute-1.amazonaws.com" # alias of hostname
 
-== Debugging:
+## Debugging:
 
 When $DEBUG is set, display debug information to the ui object using the #debug method. The API commands will print internal request information:
 
