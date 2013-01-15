@@ -195,6 +195,14 @@ class FakeAwsm < Sinatra::Base
     render :rabl, :deployment, :format => "json"
   end
 
+  post "/api/v2/apps/:app_id/environments/:environment_id/deployments/deploy" do
+    app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
+    @deployment = app_env.deployments.create(params[:deployment])
+    @deployment.deploy
+    response['Location'] = "/api/v2/apps/#{params[:app_id]}/environments/#{params[:environment_id]}/deployments/#{@deployment.id}"
+    render :rabl, :deployment, :format => "json"
+  end
+
   get "/api/v2/apps/:app_id/environments/:environment_id/deployments/last" do
     app_env = @user.accounts.apps.get(params[:app_id]).app_environments.first(:environment_id => params[:environment_id])
     @deployment = app_env.deployments.last

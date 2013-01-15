@@ -56,6 +56,35 @@ describe EY::CloudClient::AppEnvironment do
     end
   end
 
+  describe "triggering an api deploy" do
+    before do
+      @api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
+      result.should be_one_match
+      @app_env = result.matches.first
+    end
+
+    it "triggers a deployment (assumes that deploys happen instantly, which they don't)" do
+      deployment = @app_env.deploy({
+        :ref             => 'master',
+        :migrate         => true,
+        :migrate_command => 'rake migrate',
+        :extra_config    => {'extra' => 'config'},
+      })
+      deployment.config.should == {'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
+      deployment.commit.should =~ /[0-9a-f]{40}/
+      deployment.resolved_ref.should_not be_nil
+      deployment.created_at.should_not be_nil
+      deployment.finished_at.should_not be_nil
+      deployment.should be_finished
+
+      found_dep = @app_env.last_deployment
+      found_dep.id.should == deployment.id
+      found_dep.should be_finished
+      found_dep.serverside_version.should == '2.0.0.awsm' # uses the awsm version if one is not sent.
+    end
+  end
+
   describe "last deployment" do
     before do
       @api = scenario_cloud_client "Linked App"

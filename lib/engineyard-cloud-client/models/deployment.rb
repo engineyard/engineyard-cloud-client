@@ -27,6 +27,10 @@ module EY
         dep
       end
 
+      def self.deploy(api, app_environment, attrs)
+        Deployment.from_hash(api, attrs.merge(:app_environment => app_environment)).deploy
+      end
+
       def app
         app_environment.app
       end
@@ -60,6 +64,10 @@ module EY
         @config ||= {'input_ref' => ref, 'deployed_by' => deployed_by}.merge(extra_config)
       end
 
+      # Tell EY Cloud that you will be starting a deploy yourself.
+      #
+      # The name for this method isn't great. It's a relic of how the deploy
+      # ran before it ever told EY Cloud that is was running a deploy at all.
       def start
         params = {
           :migrate => migrate,
@@ -68,6 +76,21 @@ module EY
         }
         params[:migrate_command] = migrate_command if migrate
         post_to_api(params)
+      end
+
+      # Tell EY Cloud to deploy on our behalf.
+      #
+      # Deploy is different from start in that it triggers the deploy remotely.
+      # This is almost exactly equivalent to pressing the deploy button on the
+      # dashboard. No output will be returned.
+      def deploy
+        params = {
+          :migrate => migrate,
+          :ref => ref,
+        }
+        params[:serverside_version] = serverside_version if serverside_version
+        params[:migrate_command] = migrate_command if migrate
+        update_with_response api.post(collection_uri + "/deploy", 'deployment' => params)
       end
 
       def output
@@ -95,6 +118,7 @@ module EY
         response['deployment'].each do |key,val|
           send("#{key}=", val) if respond_to?("#{key}=")
         end
+        self
       end
 
       private

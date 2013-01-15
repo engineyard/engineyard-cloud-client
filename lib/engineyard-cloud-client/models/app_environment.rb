@@ -62,8 +62,24 @@ module EY
         Deployment.last(api, self)
       end
 
+      # Create a new, unsaved, Deployment record.
+      #
+      # Call start on the return object to indicate to EY Cloud that you
+      # will be starting a deployment using your own connection to your
+      # servers. This is the way that the engineyard gem does deployments.
       def new_deployment(attrs)
         Deployment.from_hash(api, attrs.merge(:app_environment => self))
+      end
+
+      # Trigger a deployment on the api side.
+      #
+      # This is like hitting the deploy button on the web interface.
+      #
+      # Returns a started deployment that will run from EY Cloud automatically.
+      # Load the deployment again to see when it finishes. This action returns
+      # immediately before the deployment is complete.
+      def deploy(attrs)
+        Deployment.deploy(api, self, attrs)
       end
 
       protected
