@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary = "EY Cloud API Client"
   s.description = "This gem connects to the EY Cloud API"
 
-  s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.rdoc)
+  s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.md)
   s.require_path = 'lib'
 
   s.rubygems_version = %q{1.3.6}
@@ -24,7 +24,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency('rspec', '~>2.0')
   s.add_development_dependency('rake')
-  s.add_development_dependency('rdoc')
   s.add_development_dependency('fakeweb')
   s.add_development_dependency('fakeweb-matcher')
   s.add_development_dependency('sinatra')
