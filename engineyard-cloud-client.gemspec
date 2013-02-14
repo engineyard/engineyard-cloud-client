@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.summary = "EY Cloud API Client"
   s.description = "This gem connects to the EY Cloud API"
 
-  s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.md)
+  s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.md ChangeLog.md)
   s.require_path = 'lib'
 
   s.rubygems_version = %q{1.3.6}
