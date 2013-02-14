@@ -14,17 +14,6 @@ end
 task :test => :spec
 task :default => :spec
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
-require 'rdoc/task'
-require File.expand_path("../lib/engineyard-cloud-client", __FILE__)
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "engineyard-cloud-client #{EY::CloudClient::VERSION}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
-  rdoc.rdoc_files.exclude('lib/vendor/**/*.rb')
-end
-
 def bump
   require 'engineyard-cloud-client'
   version_file = <<-EOF
