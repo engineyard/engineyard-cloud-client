@@ -6,11 +6,11 @@
 
 ## v1.0.10 (2013-02-20)
 
-  *
+  * Provide a test scenario for stuck deployments
 
 ## v1.0.9 (2013-02-20)
 
-  *
+  * Add the ability to cancel stuck deployments
 
 ## v1.0.8 (2013-02-14)
 
