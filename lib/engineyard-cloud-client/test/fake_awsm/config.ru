@@ -20,6 +20,7 @@ class FakeAwsm < Sinatra::Base
     Scenario::UnlinkedApp.new,
     Scenario::TwoApps.new,
     Scenario::LinkedApp.new,
+    Scenario::StuckDeployment.new,
     Scenario::MultipleAmbiguousAccounts.new,
     Scenario::LinkedAppNotRunning.new,
     Scenario::LinkedAppRedMaster.new,

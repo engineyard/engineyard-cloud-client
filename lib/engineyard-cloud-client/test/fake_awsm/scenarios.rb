@@ -79,6 +79,13 @@ module Scenario
     end
   end  # LinkedApp
 
+  class StuckDeployment < LinkedApp
+    def initialize(name = 'Stuck Deployment', email = 'stuck.deployment@test.local', pass = 'stuck')
+      super
+      @app_env.deployments.create({"ref" => "master", "migrate" => false})
+    end
+  end
+
   class MultipleAmbiguousAccounts < LinkedApp
     def initialize(name = 'Multiple Ambiguous Accounts', email = 'multiple.ambiguous.accounts@test.local', pass = 'multi')
       super
