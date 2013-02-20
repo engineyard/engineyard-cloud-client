@@ -24,7 +24,7 @@ module EY
               obj.attributes = attrs_or_struct
             else
               obj = new(api, attrs_or_struct)
-              api.registry.set(self, obj)
+              api.registry.set(self, obj.id, obj)
             end
             obj
           end

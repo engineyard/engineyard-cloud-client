@@ -11,9 +11,9 @@ module EY
         end
       end
 
-      def set(klass, obj)
-        if obj.respond_to?(:id) && obj.id
-          @registry[klass][obj.id] = obj
+      def set(klass, id, obj)
+        if id && obj
+          @registry[klass][id] = obj
         end
       end
     end
