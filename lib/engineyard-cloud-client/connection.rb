@@ -118,9 +118,31 @@ module EY
       rescue RestClient::BadGateway
         raise RequestFailed, "EY Cloud API is temporarily unavailable. Please try again soon."
       rescue RestClient::RequestFailed => e
-        raise RequestFailed, "#{e.message} #{e.response}"
+        raise RequestFailed, "Error: #{parse_error(e)}"
       rescue OpenSSL::SSL::SSLError
         raise RequestFailed, "SSL is misconfigured on your cloud"
+      end
+
+      def parse_error(error)
+        resp = error.response
+        debug("Error", error.message)
+
+        if resp.body.empty?
+          debug("Response", '<<Response body is empty>>')
+          error.message
+        elsif resp.headers[:content_type] =~ /application\/json/
+          begin
+            data = MultiJson.load(resp.body)
+            debug("Response", data)
+            data['message'] ? data['message'] : "#{error.message} #{data.inspect}"
+          rescue MultiJson::DecodeError
+            debug("Response", resp.body)
+            "#{error.message} #{resp.body}"
+          end
+        else
+          debug("Response", resp.body)
+          "#{error.message} #{resp.body}"
+        end
       end
 
       def parse_response(resp)
