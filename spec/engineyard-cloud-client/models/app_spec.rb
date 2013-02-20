@@ -16,7 +16,7 @@ describe EY::CloudClient::App do
       }
 
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/apps?no_instances=true",
-        :body => response.to_json, :content_type => "application/json")
+        :body => MultiJson.dump(response), :content_type => "application/json")
 
       apps = EY::CloudClient::App.all(cloud_client)
 
@@ -40,7 +40,7 @@ describe EY::CloudClient::App do
       }
 
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps",
-        :body => response.to_json, :content_type => "application/json")
+        :body => MultiJson.dump(response), :content_type => "application/json")
 
       app = EY::CloudClient::App.create(cloud_client, {
         "account"        => account,

@@ -35,4 +35,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency('dm-sqlite-adapter')
   s.add_development_dependency('ey_resolver', '~>0.2.1')
   s.add_development_dependency('rabl')
+  s.add_development_dependency('oj')
 end

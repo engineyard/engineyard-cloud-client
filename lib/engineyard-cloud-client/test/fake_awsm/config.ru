@@ -97,7 +97,7 @@ class FakeAwsm < Sinatra::Base
       ""
     else
       status 404
-      return {"message" => "Keypair not found with id #{params['id'].inspect}"}.to_json
+      json  "message" => "Keypair not found with id #{params['id'].inspect}"
     end
   end
 
@@ -133,7 +133,7 @@ class FakeAwsm < Sinatra::Base
   end
 
   get "/api/v2/environments/:env_id/logs" do
-    {
+    json(
       "logs" => [
         {
           "id" => 'i-12345678',
@@ -142,7 +142,7 @@ class FakeAwsm < Sinatra::Base
           "custom" => "CUSTOM LOG OUTPUT"
         }
       ]
-    }.to_json
+    )
   end
 
   get "/api/v2/environments/:env_id/recipes" do
@@ -210,7 +210,7 @@ class FakeAwsm < Sinatra::Base
       render :rabl, :deployment, :format => "json"
     else
       status(404)
-      {"message" => "Deployment not found: last"}.to_json
+      json "message" => "Deployment not found: last"
     end
   end
 
@@ -224,10 +224,10 @@ class FakeAwsm < Sinatra::Base
   post "/api/v2/authenticate" do
     user = User.first(:email => params[:email], :password => params[:password])
     if user
-      {"api_token" => user.api_token, "ok" => true}.to_json
+      json  "api_token" => user.api_token, "ok" => true
     else
       status(401)
-      {"ok" => false}.to_json
+      json  "ok" => false
     end
   end
 

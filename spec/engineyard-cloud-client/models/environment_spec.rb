@@ -36,7 +36,7 @@ describe EY::CloudClient::Environment do
       }
 
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true",
-        :body => response.to_json, :content_type => "application/json")
+        :body => MultiJson.dump(response), :content_type => "application/json")
 
       environments = EY::CloudClient::Environment.all(cloud_client)
 
@@ -80,7 +80,7 @@ describe EY::CloudClient::Environment do
            "instance_status"=>"none"}}
 
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
-        :body => response.to_json, :content_type => "application/json")
+        :body => MultiJson.dump(response), :content_type => "application/json")
 
       env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
@@ -143,7 +143,7 @@ describe EY::CloudClient::Environment do
            "instance_status"=>"starting"}}
 
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
-        :body => response.to_json, :content_type => "application/json")
+        :body => MultiJson.dump(response), :content_type => "application/json")
 
       env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
@@ -218,7 +218,7 @@ describe EY::CloudClient::Environment do
 
       FakeWeb.register_uri(:get,
         "https://cloud.engineyard.com/api/v2/environments/#{env.id}/instances",
-        :body => {"instances" => [instance_data]}.to_json,
+        :body => MultiJson.dump({"instances" => [instance_data]}),
         :content_type => 'application/json'
       )
 
