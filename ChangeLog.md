@@ -4,6 +4,10 @@
 
   *
 
+## v1.0.9 (2013-02-20)
+
+  *
+
 ## v1.0.8 (2013-02-14)
 
   * Loosen the multi\_json gem version requirement to allow 1.0 compatible security fixes.
