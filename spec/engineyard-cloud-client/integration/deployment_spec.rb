@@ -109,5 +109,37 @@ describe EY::CloudClient::AppEnvironment do
       deployment.finished
       EY::CloudClient::Deployment.last(@api, @app_env).should == deployment
     end
+
+    context "canceling" do
+      before do
+        deployment = @app_env.new_deployment({
+          :ref             => 'master',
+          :migrate         => true,
+          :migrate_command => 'rake migrate',
+        })
+        deployment.start
+      end
+
+      it "marks the deployment finish and unsuccessful with a message" do
+        deployment = EY::CloudClient::Deployment.last(@api, @app_env)
+        deployment.should_not be_finished
+        deployment.cancel
+        deployment.should be_finished
+        deployment.should_not be_successful
+        deployment.output.rewind
+        deployment.output.read.should =~ /Marked as canceled by Linked App/
+
+        EY::CloudClient::Deployment.last(@api, @app_env).should be_finished
+      end
+
+      it "raises if the deployment is already finished" do
+        deployment = EY::CloudClient::Deployment.last(@api, @app_env)
+        deployment.out << "Test output"
+        deployment.successful = true
+        deployment.finished
+        deployment.should be_finished
+        expect { deployment.cancel }.to raise_error(EY::CloudClient::Error, "Previous deployment is already finished. Aborting.")
+      end
+    end
   end
 end
