@@ -40,7 +40,7 @@ module EY
         unless String === value
           value = value.pretty_inspect.rstrip                 # remove trailing whitespace
           if value.index("\n")                                # if the inspect is multi-line
-            value.gsub!(/[\r\n]./, "\n" + ' ' * (indent + 2)) # indent it
+            value = value.gsub(/^/, " "*(indent + 2)).lstrip  # indent it
           end
         end
         @output << "#{name.to_s.rjust(indent)}  #{value.rstrip}\n"       # just one newline
