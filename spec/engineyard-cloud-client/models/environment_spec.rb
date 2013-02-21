@@ -162,12 +162,6 @@ describe EY::CloudClient::Environment do
     end
   end
 
-  describe "#destroy" do
-    it "hits the destroy action in the API" do
-      pending
-    end
-  end
-
   describe "#rebuild" do
     it "hits the rebuild action in the API" do
       env = EY::CloudClient::Environment.from_hash(cloud_client, { "id" => 46534 })

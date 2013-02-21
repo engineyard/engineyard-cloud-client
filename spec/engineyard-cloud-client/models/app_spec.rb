@@ -55,10 +55,4 @@ describe EY::CloudClient::App do
       app.account.name.should == "myaccount"
     end
   end
-
-  describe "#destroy" do
-    it "hits the destroy action in the API" do
-      pending
-    end
-  end
 end
