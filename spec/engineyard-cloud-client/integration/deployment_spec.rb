@@ -111,7 +111,7 @@ describe EY::CloudClient::AppEnvironment do
     end
   end
 
-  describe "canceling" do
+  describe "timing out (canceling)" do
     before do
       @api = scenario_cloud_client "Stuck Deployment"
       result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
@@ -122,11 +122,11 @@ describe EY::CloudClient::AppEnvironment do
     it "marks the deployment finish and unsuccessful with a message" do
       deployment = EY::CloudClient::Deployment.last(@api, @app_env)
       deployment.should_not be_finished
-      deployment.cancel
+      deployment.timeout
       deployment.should be_finished
       deployment.should_not be_successful
       deployment.output.rewind
-      deployment.output.read.should =~ /Marked as canceled by Stuck Deployment/
+      deployment.output.read.should =~ /Marked as timed out by Stuck Deployment/
 
       EY::CloudClient::Deployment.last(@api, @app_env).should be_finished
     end
@@ -137,7 +137,7 @@ describe EY::CloudClient::AppEnvironment do
       deployment.successful = true
       deployment.finished
       deployment.should be_finished
-      expect { deployment.cancel }.to raise_error(EY::CloudClient::Error, "Previous deployment is already finished. Aborting.")
+      expect { deployment.timeout }.to raise_error(EY::CloudClient::Error, "Previous deployment is already finished. Aborting.")
     end
   end
 end

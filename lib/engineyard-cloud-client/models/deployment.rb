@@ -118,16 +118,17 @@ module EY
         put_to_api({:successful => successful, :output => output.read})
       end
 
-      def cancel
+      def timeout
         if finished?
           raise EY::CloudClient::Error, "Previous deployment is already finished. Aborting."
         else
           current_user_name = api.current_user.name
           self.successful = false
-          err << "!> Marked as canceled by #{current_user_name}"
+          err << "!> Marked as timed out by #{current_user_name}"
           finished
         end
       end
+      alias cancel timeout
 
       def finished?
         !finished_at.nil?
