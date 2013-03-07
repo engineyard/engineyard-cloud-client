@@ -2,7 +2,7 @@ require 'engineyard-cloud-client/models/api_struct'
 
 module EY
   class CloudClient
-    class Instance < ApiStruct.new(:id, :role, :name, :status, :amazon_id, :public_hostname, :environment, :bridge)
+    class Instance < ApiStruct.new(:id, :role, :name, :status, :amazon_id, :public_hostname, :environment, :bridge, :availability_zone)
       alias hostname public_hostname
       alias bridge? bridge
 
