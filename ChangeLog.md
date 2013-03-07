@@ -2,7 +2,8 @@
 
 ## NEXT
 
-  *
+  * Supports Instance#availability\_zone in API response.
+  * Renames Deployment#cancel to Deployment#timeout, though still support using #cancel.
 
 ## v1.0.10 (2013-02-20)
 
