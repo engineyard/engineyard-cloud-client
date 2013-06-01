@@ -1,5 +1,4 @@
 require 'engineyard-cloud-client/test'
-require 'engineyard-cloud-client/test'
 require 'realweb'
 
 module EY::CloudClient::Test
