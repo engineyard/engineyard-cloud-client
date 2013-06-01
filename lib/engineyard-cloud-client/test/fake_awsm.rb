@@ -14,7 +14,11 @@ module EY::CloudClient::Test
       unless system("ruby -c '#{config_ru}' > /dev/null")
         raise SyntaxError, "There is a syntax error in fake_awsm/config.ru! FIX IT!"
       end
-      @server = RealWeb.start_server_in_fork(config_ru, :timeout => 10, :verbose => ENV['DEBUG'])
+      if ENV['DEBUG']
+        @server = RealWeb.start_server_in_thread(config_ru, :timeout => 10, :verbose => ENV['DEBUG'])
+      else # fork is hell for debugging
+        @server = RealWeb.start_server_in_fork(config_ru, :timeout => 10)
+      end
       @server.base_uri.to_s
     end
   end
