@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/engineyard/engineyard-cloud-client"
   s.summary = "EY Cloud API Client"
   s.description = "This gem connects to the EY Cloud API"
+  s.license = 'MIT'
 
   s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.md ChangeLog.md)
   s.require_path = 'lib'
