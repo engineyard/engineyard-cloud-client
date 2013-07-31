@@ -169,6 +169,36 @@ module EY
         name.gsub(/^#{Regexp.quote(app.name)}_/, '')
       end
 
+      # Throws a POST request at the API to /add_instances and adds one instance
+      # to this environment.
+      #
+      # Usage example:
+      #
+      # api = EY::CloudClient.new(token: 'your token here')
+      # e = (api.environments.select { |x| x.name == 'your_env_name'}).first
+      # e.add_instance(role: "app")
+      #
+      # Or -
+      #
+      # e.add_instance(role: "util", name: "foo")
+      #
+      # Note that the role for an instance MUST be either "app" or "util".
+      # No other value is acceptable. The "name" parameter can be anything,
+      # but it only applies to utility instances.
+      def add_instance(opts)
+        unless opts[:role] && ["app", "util"].include?(opts[:role])
+          # Fail immediately because we don't have valid arguments.
+          raise InvalidInstanceRole, "Instance role must be one of: app, util"
+        end
+
+        # We know opts[:role] is right, name can be passed straight to the API.
+        # Return the response body for error output, logging, etc.
+        return api.post("/environments/#{id}/add_instances", request: {
+          "role" => opts[:role],
+          "name" => opts[:name]
+        })
+      end
+
       protected
 
       def set_account(account_attrs)
