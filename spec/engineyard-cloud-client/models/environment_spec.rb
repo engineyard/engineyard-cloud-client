@@ -337,4 +337,34 @@ describe EY::CloudClient::Environment do
       FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
   end
+
+
+  describe "#instance_by_id(id)" do
+    before :all do
+      @env = EY::CloudClient::Environment.from_hash(
+        EY::CloudClient.new(token: 't'),
+        {
+          'name' => 'fake',
+          "id" => 123,
+          "instances" => [
+            {
+              "id" => 12345,
+              "role" => "app"
+            }
+          ]
+        })
+    end
+
+    after :all do
+      @env = nil
+    end
+
+    it "returns one instance when called with a valid id" do
+      @env.instance_by_id(12345).should_not be_nil
+    end
+
+    it "returns nil when called with a non-existent id" do
+      @env.instance_by_id(54321).should be_nil
+    end
+  end
 end

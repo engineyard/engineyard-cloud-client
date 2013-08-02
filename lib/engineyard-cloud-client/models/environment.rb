@@ -199,6 +199,32 @@ module EY
         })
       end
 
+      #
+      # Gets an instance's Amazon ID by its "id" attribute as reported
+      # by AWSM. When an instance is added via the API, the JSON has that's
+      # returned contains an "id" attribute for that instance. Developers
+      # may save that ID so they can later discover an instance's Amazon ID.
+      # This is because, when an instance object is first *created* (see
+      # #add_instance above), its Amazon ID isn't yet known. The object is
+      # created, and *then* later provisioned, so you can't get an Amazon
+      # ID until after provisioning has taken place. This method allows you
+      # to send an ID to it, and then returns the instance object that
+      # corresponds to that ID, which will have an Amazon ID with it if the
+      # instance has been provisioned at the time the environment information
+      # was read.
+      #
+      # Note that the ID passed in must be an integer.
+      #
+      # Usage example:
+      #
+      # api = EY::CloudClient.new(token: 'token')
+      # e = (api.environments.select { |x| x.name == 'my_env' }).first
+      # e.instance_by_id(12345)
+      # => <EY::CloudClient::Instance ...>
+      def instance_by_id(id)
+        (instances.select { |x| x.id == id }).first # ID should always be unique
+      end
+
       protected
 
       def set_account(account_attrs)
