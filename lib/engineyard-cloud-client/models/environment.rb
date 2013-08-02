@@ -169,6 +169,7 @@ module EY
         name.gsub(/^#{Regexp.quote(app.name)}_/, '')
       end
 
+      #
       # Throws a POST request at the API to /add_instances and adds one instance
       # to this environment.
       #
@@ -201,7 +202,7 @@ module EY
 
       #
       # Gets an instance's Amazon ID by its "id" attribute as reported
-      # by AWSM. When an instance is added via the API, the JSON has that's
+      # by AWSM. When an instance is added via the API, the JSON that's
       # returned contains an "id" attribute for that instance. Developers
       # may save that ID so they can later discover an instance's Amazon ID.
       # This is because, when an instance object is first *created* (see
@@ -223,6 +224,62 @@ module EY
       # => <EY::CloudClient::Instance ...>
       def instance_by_id(id)
         (instances.select { |x| x.id == id }).first # ID should always be unique
+      end
+
+      #
+      # Sends a request to the API to remove the instance specified by
+      # its "provisioned_id" (Amazon ID).
+      #
+      # Usage example:
+      #
+      # api = EY::CloudClient.new(token: 'token')
+      # e = api.env_by_name('my_app_production')
+      # bad_instance = e.instance_by_id(12345) # instance ID should have been saved upon creation
+      # e.remove_instance(bad_instance)
+      #
+      # Warnings/caveats:
+      #
+      # + The API is responsible for actually removing this instance. All this
+      #   does is send an appropriate request to the API.
+      # + You should look carefully at the API response JSON to see whether or
+      #   not the API accepted or rejected your request. If it accepted the
+      #   request, that instance *should* be removed as soon as possible.
+      # + Note that this is a client that talks to an API, which talks to an
+      #   API, which talks to an API. Ultimately the IaaS provider API has the
+      #   final say on whether or not to remove an instance, so a failure there
+      #   can definitely affect how things work at every point down the line.
+      # + If the instance you pass in doesn't exist in the live cloud
+      #   environment you're working on, the status should be rejected and thus
+      #   the instance won't be removed (because *that* instance isn't there).
+      #   This is important to keep in mind for scheduled/auto scaling; if
+      #   for some reason the automatically added instance is removed before
+      #   a "scale down" event that you might trigger, you may wind up with an
+      #   unknown/unexpected number of instances in your environment.
+      # + Only works for app/util instances. Raises an error if you pass one
+      #   that isn't valid.
+      def remove_instance(instance)
+        # Check to make sure that we have a valid instance role here first.
+        unless ["app", "util"].include?(instance.role)
+          raise InvalidInstanceRole, "Removing instances is only supported for app, util instances"
+        end
+
+        # Check to be sure that instance is actually provisioned
+        # TODO: Rip out the amazon_id stuff when we have IaaS agnosticism nailed down
+        unless instance.amazon_id && instance.provisioned?
+          raise InstanceNotProvisioned, "Instance is not provisioned or is in unusual state."
+        end
+
+        response = api.post("/environments/#{id}/remove_instances", request: {
+          provisioned_id: instance.amazon_id,
+          role: instance.role
+        })
+
+        # Reload instances so we have a "fresh" set of data after sending a
+        # removal request.
+        request_instances
+
+        # Return the response.
+        return response
       end
 
       protected

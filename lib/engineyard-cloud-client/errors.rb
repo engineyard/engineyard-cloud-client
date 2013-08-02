@@ -3,10 +3,11 @@ module EY
     class Error < RuntimeError
     end
 
-    class RequestFailed       < Error; end
-    class InvalidCredentials  < RequestFailed; end
-    class ResourceNotFound    < RequestFailed; end
-    class InvalidInstanceRole < Error; end
+    class RequestFailed          < Error; end
+    class InvalidCredentials     < RequestFailed; end
+    class ResourceNotFound       < RequestFailed; end
+    class InvalidInstanceRole    < Error; end
+    class InstanceNotProvisioned < Error; end
 
     class BadEndpointError < Error
       def initialize(endpoint)
