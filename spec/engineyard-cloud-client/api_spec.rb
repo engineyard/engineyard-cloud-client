@@ -62,4 +62,32 @@ describe EY::CloudClient do
       EY::CloudClient.new.authenticate!("a@b.com", "foo")
     }.should raise_error(EY::CloudClient::RequestFailed, /Error: 409 Conflict What a useful error message!/)
   end
+
+  describe "#environment_by_name(name)" do
+    before :all do
+      response = {"environments" => [{"name"=>"myapp_production","id"=>30573,
+           "instance_status"=>"none"}]}
+
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true",
+        :body => MultiJson.dump(response), :content_type => "application/json")
+    end
+
+    it "returns an environment object when an existing env name is supplied" do
+      api = EY::CloudClient.new(token: 't')
+      api.environment_by_name('myapp_production').should_not be_nil
+      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true")
+    end
+
+    it "returns an environment object when calling env_by_name (alias)" do
+      api = EY::CloudClient.new(token: 't')
+      api.env_by_name('myapp_production').should_not be_nil
+      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true")
+    end
+
+    it "returns nil when passing it an env name that doesn't exist" do
+      api = EY::CloudClient.new(token: 't')
+      api.environment_by_name('wibble').should be_nil
+      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true")
+    end
+  end
 end
