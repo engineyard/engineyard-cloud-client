@@ -295,7 +295,7 @@ describe EY::CloudClient::Environment do
   describe "#remove_instance(instance)" do
     before :all do
       @env = EY::CloudClient::Environment.from_hash(
-        EY::CloudClient.new(token: 't'),
+        EY::CloudClient.new(:token => 't'),
         {
           'name' => 'fake',
           'id' => '123',
@@ -325,7 +325,7 @@ describe EY::CloudClient::Environment do
       )
 
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances",
-        body: '{
+        :body => '{
           "request"  => {"provisioned_id"=>"i-xxxxxx", "role"=>"app"},
           "instance" => {"amazon_id"=>"i-xxxxxxx" "id"=>12345, "role"=>"app", "status"=>"running"},
           "status"=>"accepted"
@@ -333,7 +333,7 @@ describe EY::CloudClient::Environment do
 
       # For the end of the remove method, getting new instance data
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
-        body: '{[{"id": 12345,"role": "app"}]}')
+        :body => '{[{"id": 12345,"role": "app"}]}')
     end
 
     after :all do
@@ -368,11 +368,11 @@ describe EY::CloudClient::Environment do
   describe "#add_instances(name: 'foo', role: 'app')" do
     before :all do
       @env = EY::CloudClient::Environment.from_hash(
-        EY::CloudClient.new(token: 't'), {'name' => 'fake', "id" => "123"} )
+        EY::CloudClient.new(:token => 't'), {'name' => 'fake', "id" => "123"} )
 
       # Register the API endpoint with FakeWeb
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances",
-        body: '{
+        :body => '{
             "request"=>{"role"=>"app", "name"=>"foo"},
             "instance"=>{
               "id"=>257843, "name"=>nil,
@@ -388,25 +388,25 @@ describe EY::CloudClient::Environment do
 
     it "will raise if role isn't present" do
       expect {
-        @env.add_instance(name: 'foo')
+        @env.add_instance(:name => 'foo')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
       FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "will raise if role isn't either app or util" do
       expect {
-        @env.add_instance(role: 'fake')
+        @env.add_instance(:role => 'fake')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
       FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "sends a POST request to the API" do
-      @env.add_instance(role: "app")
+      @env.add_instance(:role => "app")
       FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "returns the API's response body" do
-      @env.add_instance(role: "util", name: "blah").should_not be_nil
+      @env.add_instance(:role => "util", :name => "blah").should_not be_nil
       FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
   end
@@ -415,7 +415,7 @@ describe EY::CloudClient::Environment do
   describe "#instance_by_id(id)" do
     before :all do
       @env = EY::CloudClient::Environment.from_hash(
-        EY::CloudClient.new(token: 't'),
+        EY::CloudClient.new(:token => 't'),
         {
           'name' => 'fake',
           "id" => 123,

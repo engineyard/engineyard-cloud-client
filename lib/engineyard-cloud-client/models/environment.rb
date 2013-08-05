@@ -211,25 +211,23 @@ module EY
       # Usage example:
       #
       # api = EY::CloudClient.new(token: 'your token here')
-      # e = (api.environments.select { |x| x.name == 'your_env_name'}).first
-      # e.add_instance(role: "app")
+      # env = api.environment_by_name('your_env_name')
       #
-      # Or -
-      #
-      # e.add_instance(role: "util", name: "foo")
+      # env.add_instance(role: "app")
+      # env.add_instance(role: "util", name: "foo")
       #
       # Note that the role for an instance MUST be either "app" or "util".
       # No other value is acceptable. The "name" parameter can be anything,
       # but it only applies to utility instances.
       def add_instance(opts)
-        unless opts[:role] && ["app", "util"].include?(opts[:role])
+        unless %w[app util].include?(opts[:role].to_s)
           # Fail immediately because we don't have valid arguments.
           raise InvalidInstanceRole, "Instance role must be one of: app, util"
         end
 
         # We know opts[:role] is right, name can be passed straight to the API.
         # Return the response body for error output, logging, etc.
-        return api.post("/environments/#{id}/add_instances", request: {
+        return api.post("/environments/#{id}/add_instances", :request => {
           "role" => opts[:role],
           "name" => opts[:name]
         })
@@ -253,12 +251,12 @@ module EY
       #
       # Usage example:
       #
-      # api = EY::CloudClient.new(token: 'token')
-      # e = (api.environments.select { |x| x.name == 'my_env' }).first
-      # e.instance_by_id(12345)
-      # => <EY::CloudClient::Instance ...>
+      #   api = EY::CloudClient.new(token: 'token')
+      #   env = api.environment_by_name('my_env')
+      #   env.instance_by_id(12345)
+      #   => <EY::CloudClient::Instance ...>
       def instance_by_id(id)
-        (instances.select { |x| x.id == id }).first # ID should always be unique
+        instances.detect { |x| x.id == id } # ID should always be unique
       end
 
       #
@@ -267,10 +265,10 @@ module EY
       #
       # Usage example:
       #
-      # api = EY::CloudClient.new(token: 'token')
-      # e = api.env_by_name('my_app_production')
-      # bad_instance = e.instance_by_id(12345) # instance ID should have been saved upon creation
-      # e.remove_instance(bad_instance)
+      #   api = EY::CloudClient.new(token: 'token')
+      #   env = api.environment_by_name('my_app_production')
+      #   bad_instance = env.instance_by_id(12345) # instance ID should be saved upon creation
+      #   env.remove_instance(bad_instance)
       #
       # Warnings/caveats:
       #
@@ -294,7 +292,7 @@ module EY
       #   that isn't valid.
       def remove_instance(instance)
         # Check to make sure that we have a valid instance role here first.
-        unless ["app", "util"].include?(instance.role)
+        unless %w[app util].include?(instance.role)
           raise InvalidInstanceRole, "Removing instances is only supported for app, util instances"
         end
 
@@ -304,14 +302,13 @@ module EY
           raise InstanceNotProvisioned, "Instance is not provisioned or is in unusual state."
         end
 
-        response = api.post("/environments/#{id}/remove_instances", request: {
-          provisioned_id: instance.amazon_id,
-          role: instance.role
+        response = api.post("/environments/#{id}/remove_instances", :request => {
+          :provisioned_id => instance.amazon_id,
+          :role => instance.role
         })
 
-        # Reload instances so we have a "fresh" set of data after sending a
-        # removal request.
-        request_instances
+        # Reset instances so they are fresh if they are requested again.
+        @instances = nil
 
         # Return the response.
         return response
