@@ -17,6 +17,10 @@ module EY
       def provisioned?
         hostname && role && status != "starting" # not foolproof, but help throw out bad instances
       end
+
+      def remove
+        environment.remove_instance(self)
+      end
     end
   end
 end

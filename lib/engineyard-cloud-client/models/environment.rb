@@ -37,6 +37,41 @@ module EY
         ResolverResult.new(api, matches, response['errors'], response['suggestions'])
       end
 
+      # Accepts an api object, environment name and optional account name
+      # and returns the best matching environment for the given constraints.
+      #
+      # This is a shortcut for resolve_environments.
+      # Raises if nothing is found or if more than one environment is found.
+      def self.by_name(api, environment_name, account_name=nil)
+        constraints = {
+          :environment_name => environment_name,
+          :account_name     => account_name,
+        }
+        resolver = resolve(api, constraints)
+
+        resolver.one_match { |match| return match  }
+
+        resolver.no_matches do |errors, suggestions|
+          message = nil
+          if suggestions.any?
+            message = "Suggestions found:\n"
+            suggestions.sourt_by{|suggest| suggest['account_name']}.each do |suggest|
+              message << "\t#{suggest['account_name']}/#{suggest['env_name']}\n"
+            end
+          end
+
+          raise ResourceNotFound.new([errors,message].compact.join("\n").strip)
+        end
+
+        resolver.many_matches do |matches|
+          message = "Multiple environments possible, please be more specific:\n"
+          matches.sort_by {|env| env.account}.each do |env|
+            message << "\t#{env.account.name}/#{env.name}\n"
+          end
+          raise MultipleMatchesError.new(message)
+        end
+      end
+
       # Usage
       # Environment.create(api, {
       #      app: app,                            # requires: app.id
@@ -167,6 +202,120 @@ module EY
 
       def shorten_name_for(app)
         name.gsub(/^#{Regexp.quote(app.name)}_/, '')
+      end
+
+      #
+      # Throws a POST request at the API to /add_instances and adds one instance
+      # to this environment.
+      #
+      # Usage example:
+      #
+      # api = EY::CloudClient.new(token: 'your token here')
+      # env = api.environment_by_name('your_env_name')
+      #
+      # env.add_instance(role: "app")
+      # env.add_instance(role: "util", name: "foo")
+      #
+      # Note that the role for an instance MUST be either "app" or "util".
+      # No other value is acceptable. The "name" parameter can be anything,
+      # but it only applies to utility instances.
+      def add_instance(opts)
+        unless %w[app util].include?(opts[:role].to_s)
+          # Fail immediately because we don't have valid arguments.
+          raise InvalidInstanceRole, "Instance role must be one of: app, util"
+        end
+
+        # We know opts[:role] is right, name can be passed straight to the API.
+        # Return the response body for error output, logging, etc.
+        return api.post("/environments/#{id}/add_instances", :request => {
+          "role" => opts[:role],
+          "name" => opts[:name]
+        })
+      end
+
+      #
+      # Gets an instance's Amazon ID by its "id" attribute as reported
+      # by AWSM. When an instance is added via the API, the JSON that's
+      # returned contains an "id" attribute for that instance. Developers
+      # may save that ID so they can later discover an instance's Amazon ID.
+      # This is because, when an instance object is first *created* (see
+      # #add_instance above), its Amazon ID isn't yet known. The object is
+      # created, and *then* later provisioned, so you can't get an Amazon
+      # ID until after provisioning has taken place. This method allows you
+      # to send an ID to it, and then returns the instance object that
+      # corresponds to that ID, which will have an Amazon ID with it if the
+      # instance has been provisioned at the time the environment information
+      # was read.
+      #
+      # Note that the ID passed in must be an integer.
+      #
+      # Usage example:
+      #
+      #   api = EY::CloudClient.new(token: 'token')
+      #   env = api.environment_by_name('my_env')
+      #   env.instance_by_id(12345)
+      #   => <EY::CloudClient::Instance ...>
+      def instance_by_id(id)
+        instances.detect { |x| x.id == id } # ID should always be unique
+      end
+
+      #
+      # Sends a request to the API to remove the instance specified by
+      # its "provisioned_id" (Amazon ID).
+      #
+      # Usage example:
+      #
+      #   api = EY::CloudClient.new(token: 'token')
+      #   env = api.environment_by_name('my_app_production')
+      #   bad_instance = env.instance_by_id(12345) # instance ID should be saved upon creation
+      #   env.remove_instance(bad_instance)
+      #
+      # Warnings/caveats:
+      #
+      # + The API is responsible for actually removing this instance. All this
+      #   does is send an appropriate request to the API.
+      # + You should look carefully at the API response JSON to see whether or
+      #   not the API accepted or rejected your request. If it accepted the
+      #   request, that instance *should* be removed as soon as possible.
+      # + Note that this is a client that talks to an API, which talks to an
+      #   API, which talks to an API. Ultimately the IaaS provider API has the
+      #   final say on whether or not to remove an instance, so a failure there
+      #   can definitely affect how things work at every point down the line.
+      # + If the instance you pass in doesn't exist in the live cloud
+      #   environment you're working on, the status should be rejected and thus
+      #   the instance won't be removed (because *that* instance isn't there).
+      #   This is important to keep in mind for scheduled/auto scaling; if
+      #   for some reason the automatically added instance is removed before
+      #   a "scale down" event that you might trigger, you may wind up with an
+      #   unknown/unexpected number of instances in your environment.
+      # + Only works for app/util instances. Raises an error if you pass one
+      #   that isn't valid.
+      def remove_instance(instance)
+        unless instance
+          raise ArgumentError, "A argument of type Instance was expected. Got #{instance.inspect}"
+        end
+
+        # Check to make sure that we have a valid instance role here first.
+        unless %w[app util].include?(instance.role)
+          raise InvalidInstanceRole, "Removing instances is only supported for app, util instances"
+        end
+
+        # Check to be sure that instance is actually provisioned
+        # TODO: Rip out the amazon_id stuff when we have IaaS agnosticism nailed down
+        unless instance.amazon_id && instance.provisioned?
+          raise InstanceNotProvisioned, "Instance is not provisioned or is in unusual state."
+        end
+
+        response = api.post("/environments/#{id}/remove_instances", :request => {
+          :provisioned_id => instance.amazon_id,
+          :role => instance.role
+        })
+
+        # Reset instances so they are fresh if they are requested again.
+        @instances = nil
+
+        # Return the response.
+        return response
       end
 
       protected

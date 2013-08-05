@@ -64,5 +64,17 @@ module EY
       EY::CloudClient::User.from_hash(self, get('/current_user')['user'])
     end
 
+    # Accepts an environment name and optional account name and returns the
+    # best matching environment for the given constraints.
+    #
+    # This is a shortcut for Environment.resolve
+    # Raises if nothing is found or if more than one env is found.
+    def environment_by_name(environment_name, account_name=nil)
+      EY::CloudClient::Environment.by_name(self, environment_name, account_name)
+    end
+
+    # For ease of use:
+    alias :env_by_name :environment_by_name
+
   end # API
 end # EY

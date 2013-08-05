@@ -291,4 +291,172 @@ describe EY::CloudClient::Environment do
       short('dev', 'dev').should == 'dev'
     end
   end
+
+  describe "#remove_instance(instance)" do
+    before do
+      @instances_response =  [
+        {
+          'id' => 12345,
+          'role' => 'app',
+          'status' => 'stale',
+        },
+        {
+          'id' => 54321,
+          'role' => 'util',
+          'public_hostname' => 'some-hostname',
+          'status' => 'running',
+          'amazon_id' => 'i-xxxxxxx'
+        },
+        {
+          'id' => 8675309,
+          'role' => 'db_master'
+        },
+        {
+          'id' => 55555,
+          'role' => 'app',
+          'public_hostname' => 'some-hostname',
+          'status' => 'running',
+          'amazon_id' => 'i-xxxxxxx'
+        }
+      ]
+
+      @api = EY::CloudClient.new(:token => 't')
+      @env = EY::CloudClient::Environment.from_hash(@api, {
+        'name' => 'fake',
+        'id' => '123',
+        'instances_count' => 4,
+      })
+
+      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances",
+        :content_type => "application/json",
+        :body => MultiJson.dump({
+          "request"  => {"provisioned_id"=>"i-xxxxxx", "role"=>"app"},
+          "instance" => {"amazon_id"=>"i-xxxxxxx", "id"=>12345, "role"=>"app", "status"=>"running"},
+          "status"=>"accepted"
+        }))
+
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
+        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
+    end
+
+    after do
+      @env = nil # clean up
+    end
+
+    it "raises an error if role isn't app/util" do
+      i = @env.instance_by_id(8675309)
+      expect {
+        @env.remove_instance(i) # db_master, should fail
+      }.to raise_error EY::CloudClient::InvalidInstanceRole
+      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "raises an error if the instance isn't provisioned yet" do
+      i = @env.instance_by_id(12345)
+      expect {
+        @env.remove_instance(i) # app, but not provisioned and no amazon id
+      }.to raise_error EY::CloudClient::InstanceNotProvisioned
+      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "sends an API request when things check out" do
+      i = @env.instance_by_id(55555) # known good instance as defined above
+      expect {
+        @env.remove_instance(i)
+      }.to_not raise_error
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "does the same thing when Instance#remove helper method is used instead" do
+      i = @env.instance_by_id(54321)
+      expect {
+        i.remove
+      }.to_not raise_error
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "reloads the instances after a remove request" do
+      @env.instance_by_id(55555).remove
+      @instances_response.pop
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
+        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
+      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
+    end
+  end
+
+  describe "#add_instances(name: 'foo', role: 'app')" do
+    before :all do
+      @env = EY::CloudClient::Environment.from_hash(
+        EY::CloudClient.new(:token => 't'), {'name' => 'fake', "id" => "123"} )
+
+      # Register the API endpoint with FakeWeb
+      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances",
+        :body => '{
+            "request"=>{"role"=>"app", "name"=>"foo"},
+            "instance"=>{
+              "id"=>257843, "name"=>nil,
+              "role"=>"app", "status"=>"starting"
+            },
+            "status"=>"accepted"}'
+      )
+    end
+
+    after :all do
+      @env = nil # clean up
+    end
+
+    it "will raise if role isn't present" do
+      expect {
+        @env.add_instance(:name => 'foo')
+      }.to raise_error EY::CloudClient::InvalidInstanceRole
+      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+    end
+
+    it "will raise if role isn't either app or util" do
+      expect {
+        @env.add_instance(:role => 'fake')
+      }.to raise_error EY::CloudClient::InvalidInstanceRole
+      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+    end
+
+    it "sends a POST request to the API" do
+      @env.add_instance(:role => "app")
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+    end
+
+    it "returns the API's response body" do
+      @env.add_instance(:role => "util", :name => "blah").should_not be_nil
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+    end
+  end
+
+
+  describe "#instance_by_id(id)" do
+    before :all do
+      @env = EY::CloudClient::Environment.from_hash(
+        EY::CloudClient.new(:token => 't'),
+        {
+          'name' => 'fake',
+          "id" => 123,
+          "instances" => [
+            {
+              "id" => 12345,
+              "role" => "app"
+            }
+          ]
+        })
+    end
+
+    after :all do
+      @env = nil
+    end
+
+    it "returns one instance when called with a valid id" do
+      @env.instance_by_id(12345).should_not be_nil
+    end
+
+    it "returns nil when called with a non-existent id" do
+      @env.instance_by_id(54321).should be_nil
+    end
+  end
 end

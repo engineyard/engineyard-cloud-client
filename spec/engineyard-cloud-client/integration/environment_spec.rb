@@ -56,6 +56,26 @@ describe EY::CloudClient::Environment do
     end
   end
 
+  describe "api.environment_by_name / Environment.by_name / api.env_by_name" do
+    it "finds an environment" do
+      api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      result = api.environment_by_name('giblets', 'main')
+      result.should be_a_kind_of(EY::CloudClient::Environment)
+      result.name.should == 'giblets'
+      result.account.name.should == 'main'
+    end
+
+    it "raises on ambiguous query" do
+      api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      expect { EY::CloudClient::Environment.by_name(api, 'giblets') }.to raise_error(EY::CloudClient::MultipleMatchesError)
+    end
+
+    it "raises when env doesn't exist" do
+      api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      expect { api.env_by_name('gobblegobble') }.to raise_error(EY::CloudClient::ResourceNotFound)
+    end
+  end
+
   context "with an environment" do
     before do
       api = scenario_cloud_client "Linked App"

@@ -27,6 +27,7 @@ require 'rspec'
 require 'tmpdir'
 require 'yaml'
 require 'pp'
+require 'pry'
 support = Dir[File.join(EY_ROOT,'/spec/support/*.rb')]
 support.each{|helper| require helper }
 
