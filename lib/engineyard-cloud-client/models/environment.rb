@@ -291,6 +291,10 @@ module EY
       # + Only works for app/util instances. Raises an error if you pass one
       #   that isn't valid.
       def remove_instance(instance)
+        unless instance
+          raise ArgumentError, "A argument of type Instance was expected. Got #{instance.inspect}"
+        end
+
         # Check to make sure that we have a valid instance role here first.
         unless %w[app util].include?(instance.role)
           raise InvalidInstanceRole, "Removing instances is only supported for app, util instances"

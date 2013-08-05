@@ -293,50 +293,53 @@ describe EY::CloudClient::Environment do
   end
 
   describe "#remove_instance(instance)" do
-    before :all do
-      @env = EY::CloudClient::Environment.from_hash(
-        EY::CloudClient.new(:token => 't'),
+    before do
+      @instances_response =  [
         {
-          'name' => 'fake',
-          'id' => '123',
-          'instances_count' => 4,
-          'instances' => [
-            {
-              'id' => 12345,
-              'role' => 'app'
-            },
-            {
-              'id' => 54321,
-              'role' => 'util'
-            },
-            {
-              'id' => 8675309,
-              'role' => 'db_master'
-            },
-            {
-              'id' => 55555,
-              'role' => 'app',
-              'public_hostname' => 'some-hostname',
-              'status' => 'running',
-              'amazon_id' => 'i-xxxxxxx'
-            }
-          ]
+          'id' => 12345,
+          'role' => 'app',
+          'status' => 'stale',
+        },
+        {
+          'id' => 54321,
+          'role' => 'util',
+          'public_hostname' => 'some-hostname',
+          'status' => 'running',
+          'amazon_id' => 'i-xxxxxxx'
+        },
+        {
+          'id' => 8675309,
+          'role' => 'db_master'
+        },
+        {
+          'id' => 55555,
+          'role' => 'app',
+          'public_hostname' => 'some-hostname',
+          'status' => 'running',
+          'amazon_id' => 'i-xxxxxxx'
         }
-      )
+      ]
+
+      @api = EY::CloudClient.new(:token => 't')
+      @env = EY::CloudClient::Environment.from_hash(@api, {
+        'name' => 'fake',
+        'id' => '123',
+        'instances_count' => 4,
+      })
 
       FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances",
-        :body => '{
+        :content_type => "application/json",
+        :body => MultiJson.dump({
           "request"  => {"provisioned_id"=>"i-xxxxxx", "role"=>"app"},
-          "instance" => {"amazon_id"=>"i-xxxxxxx" "id"=>12345, "role"=>"app", "status"=>"running"},
+          "instance" => {"amazon_id"=>"i-xxxxxxx", "id"=>12345, "role"=>"app", "status"=>"running"},
           "status"=>"accepted"
-        }')
+        }))
 
-      # For the end of the remove method, getting new instance data
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
-        :body => '{[{"id": 12345,"role": "app"}]}')
+        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
     end
 
-    after :all do
+    after do
       @env = nil # clean up
     end
 
@@ -362,6 +365,22 @@ describe EY::CloudClient::Environment do
         @env.remove_instance(i)
       }.to_not raise_error
       FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "does the same thing when Instance#remove helper method is used instead" do
+      i = @env.instance_by_id(54321)
+      expect {
+        i.remove
+      }.to_not raise_error
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
+
+    it "reloads the instances after a remove request" do
+      @env.instance_by_id(55555).remove
+      @instances_response.pop
+      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
+        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
+      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
     end
   end
 
