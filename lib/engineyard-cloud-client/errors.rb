@@ -8,6 +8,7 @@ module EY
     class ResourceNotFound       < RequestFailed; end
     class InvalidInstanceRole    < Error; end
     class InstanceNotProvisioned < Error; end
+    class MultipleMatchesError   < RequestFailed; end
 
     class BadEndpointError < Error
       def initialize(endpoint)

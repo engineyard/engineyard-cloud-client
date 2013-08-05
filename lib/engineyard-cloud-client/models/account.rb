@@ -33,6 +33,10 @@ module EY
       def environments
         @environments ||= []
       end
+
+      def <=>(other)
+        name <=> other.name
+      end
     end
   end
 end

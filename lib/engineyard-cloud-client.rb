@@ -64,34 +64,13 @@ module EY
       EY::CloudClient::User.from_hash(self, get('/current_user')['user'])
     end
 
+    # Accepts an environment name and optional account name and returns the
+    # best matching environment for the given constraints.
     #
-    # Accepts a name parameter and returns the FIRST environment by name
-    # to match that parameter.
-    #
-    # WARNING WARNING WARNING WARNING WARNING
-    #
-    # THIS MAY NOT BE THE ENVIRONMENT YOU WERE LOOKING FOR. This method
-    # returns the FIRST object in an array to match. If you name your
-    # environments projectname_envtype (e.g. 'todo_production') and have
-    # -zero- duplication of environment names *across accounts*, this is
-    # probably going to work just fine for you.
-    #
-    # BUT
-    #
-    # On the other hand, IF YOU NAME ENVIRONMENTS WITH THE SAME NAME,
-    # even across different accounts, (e.g. two or more 'production'
-    # environments), this may not return the one you want. Take extra
-    # steps, such as examining the number and type of instances, the
-    # git URI, and/or the account name, to see if this is the
-    # right environment.
-    #
-    # Usage exapmle:
-    #
-    # api = EY::CloudClient.new(token: 'token')
-    # env = api.environment_by_name("something_production")
-    # => <EY::CloudClient::Environment ...>
-    def environment_by_name(name)
-      (environments.select { |x| x.name == name }).first
+    # This is a shortcut for Environment.resolve
+    # Raises if nothing is found or if more than one env is found.
+    def environment_by_name(environment_name, account_name=nil)
+      EY::CloudClient::Environment.by_name(self, environment_name, account_name)
     end
 
     # For ease of use:
