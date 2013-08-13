@@ -28,7 +28,6 @@ for any problems you encounter.
 Setup:
 
     require 'engineyard-cloud-client'
-    require 'engineyard-cloud-client/test'
 
     api = EY::CloudClient.new
 
