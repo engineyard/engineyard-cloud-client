@@ -1,6 +1,7 @@
 require 'engineyard-cloud-client/models/api_struct'
 require 'engineyard-cloud-client/errors'
 require 'stringio'
+require 'time'
 
 module EY
   class CloudClient
