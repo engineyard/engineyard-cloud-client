@@ -1,6 +1,7 @@
 require 'engineyard-cloud-client/models/api_struct'
 require 'engineyard-cloud-client/errors'
 require 'stringio'
+require 'date'
 
 module EY
   class CloudClient
@@ -53,7 +54,7 @@ module EY
 
       def created_at=(cat)
         if String === cat
-          super Time.parse(cat)
+          super DateTime.parse(cat).to_time
         else
           super
         end
@@ -61,7 +62,7 @@ module EY
 
       def finished_at=(fat)
         if String === fat
-          super Time.parse(fat)
+          super DateTime.parse(fat).to_time
         else
           super
         end
