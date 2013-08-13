@@ -30,12 +30,14 @@ Setup:
     require 'engineyard-cloud-client'
     require 'engineyard-cloud-client/test'
 
-    token  = EY::CloudClient.new.authenticate("your@email.com", "password")
-    ui = EY::CloudClient::Test::VerboseUI.new
-    # Test::VerboseUI is used in this example for simplicity.
-    # You may substitute your own ui object with #debug and #info methods
+    api = EY::CloudClient.new
 
-    ey_api = EY::CloudClient.new(token, ui)
+    # the api object will retain the token after authenticate is called
+    token = api.authenticate("your@email.com", "password")
+
+    # or, if you already have the token
+    api = EY::CloudClient.new(token: api_token)
+
 
 Current User:
 
