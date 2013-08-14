@@ -54,6 +54,16 @@ module EY
       @apps ||= EY::CloudClient::App.all(self)
     end
 
+    def update_vars(app_environment)
+      response = self.put("/app_environments/#{app_environment.id}", {:vars => app_environment.vars})
+      app_environment.vars = response["vars"]
+      app_environment
+    end
+
+    def addons_for(account)
+      self.get("/accounts/#{account.id}/addons")
+    end
+
     # TODO: unhaxor
     # This should load an api endpoint that deals directly in app_deployments
     def app_environments

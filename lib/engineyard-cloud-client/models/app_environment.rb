@@ -6,7 +6,7 @@ require 'engineyard-cloud-client/resolver_result'
 
 module EY
   class CloudClient
-    class AppEnvironment < ApiStruct.new(:id, :app, :environment, :uri, :domain_name, :migrate_command, :migrate)
+    class AppEnvironment < ApiStruct.new(:id, :app, :environment, :uri, :domain_name, :migrate_command, :migrate, :vars)
 
       # Return a constrained list of app_environments given a set of constraints like:
       #
@@ -36,6 +36,10 @@ module EY
         super
         set_app         app_attrs         if app_attrs
         set_environment environment_attrs if environment_attrs
+      end
+
+      def account
+        app.account
       end
 
       def account_name

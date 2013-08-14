@@ -59,6 +59,7 @@ module EY
       end
 
       def request(meth, path, params=nil, extra_headers=nil)
+        # puts "REQUEST #{path} #{params.inspect}"
         url    = endpoint + "api/v2#{path}"
         meth   ||= 'get'
         meth   = meth.to_s.downcase.to_sym
@@ -84,6 +85,7 @@ module EY
         resp = do_request(meth, url, params, headers)
         data = parse_response(resp)
 
+        # puts data.inspect
         data
       end
 
