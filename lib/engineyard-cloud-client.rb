@@ -57,6 +57,7 @@ module EY
     def update_vars(app_environment)
       response = self.put("/app_environments/#{app_environment.id}", {:vars => app_environment.vars})
       app_environment.vars = response["vars"]
+      app_environment.vars_resolved = response["vars_resolved"]
       app_environment
     end
 
