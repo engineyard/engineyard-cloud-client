@@ -34,8 +34,8 @@ module EY
         @environments ||= []
       end
 
-      def <=>(other)
-        name <=> other.name
+      def sort_attributes
+        sort_string(name)
       end
     end
   end

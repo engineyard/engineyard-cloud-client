@@ -100,6 +100,20 @@ describe EY::CloudClient::Environment do
       @env.deploy_to_instances.map(&:role).should =~ %w[app_master app util util]
     end
 
+    it "sorts instances" do
+      expect(@env.instances.map do |i|
+        [i.role,       i.name,                                i.public_hostname]
+      end).to eq([
+        ["app_master", nil,       "app_master_hostname.compute-1.amazonaws.com"],
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
+        ["db_master",  nil,        "db_master_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   "Slave I", "db_slave_1_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   nil,       "db_slave_2_hostname.compute-1.amazonaws.com"],
+        ["util" ,      "fluffy", "util_fluffy_hostname.compute-1.amazonaws.com"],
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
     it "updates the environment" do
       @env.update.should be_true
     end

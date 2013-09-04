@@ -63,6 +63,10 @@ module EY
         set_environments environments_attrs if environments_attrs
       end
 
+      def sort_attributes
+        [sort_string(account_name), sort_string(name)]
+      end
+
       protected
 
       def set_account(account_attrs)

@@ -140,6 +140,10 @@ module EY
         self
       end
 
+      def sort_attributes
+        [created_at || finished_at || Time.now]
+      end
+
       private
 
       def post_to_api(params)

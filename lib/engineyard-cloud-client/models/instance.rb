@@ -21,6 +21,13 @@ module EY
       def remove
         environment.remove_instance(self)
       end
+
+      def sort_attributes
+        # Shift app_master above app since that's how it's usually shown
+        sort_role = role == 'app' ? 'app_slave' : role
+        [sort_string(sort_role), sort_string(name), sort_string(hostname)]
+      end
+
     end
   end
 end

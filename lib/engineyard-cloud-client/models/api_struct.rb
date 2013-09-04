@@ -45,6 +45,27 @@ module EY
         end
       end
 
+      def inspect
+        %|#<#{self.class.name} #{(members - [:api]).map { |x| "#{x}=#{send(x).inspect}" }.join(" ")}>|
+      end
+
+      def <=>(other)
+        unless other.is_a?(self.class)
+          raise ArgumentError, "comparison of #{self.class.name} with #{other.class.name} failed"
+        end
+        sort_attributes <=> other.sort_attributes
+      end
+
+      def sort_attributes
+        members.map { |m| sort_string(m.to_s) }
+      end
+
+      protected
+
+      # Return ~, which comes late in lexical order, to avoid comparison to nil
+      def sort_string(str)
+        str || "~"
+      end
     end
   end
 end

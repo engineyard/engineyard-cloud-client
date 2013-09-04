@@ -32,6 +32,10 @@ module EY
       def destroy
         api.delete("/keypairs/#{id}")
       end
+
+      def sort_attributes
+        sort_string(name)
+      end
     end
   end
 end

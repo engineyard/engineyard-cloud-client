@@ -18,7 +18,7 @@ describe EY::CloudClient::App do
       api = scenario_cloud_client "One App Many Envs"
       app = api.apps.first
       app.environments.size.should == 2
-      app.environments.map(&:name).should =~ %w[giblets bakon]
+      app.environments.sort.map(&:name).should =~ %w[bakon giblets]
     end
   end
 

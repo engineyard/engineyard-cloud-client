@@ -55,7 +55,7 @@ module EY
       end
 
       def hierarchy_name
-        [account_name, app_name, environment_name].join('/')
+        [account_name, app_name, environment_name].join(' / ')
       end
 
       def last_deployment
@@ -80,6 +80,10 @@ module EY
       # immediately before the deployment is complete.
       def deploy(attrs)
         Deployment.deploy(api, self, attrs)
+      end
+
+      def sort_attributes
+        [sort_string(account_name), sort_string(app_name), sort_string(environment_name)]
       end
 
       protected

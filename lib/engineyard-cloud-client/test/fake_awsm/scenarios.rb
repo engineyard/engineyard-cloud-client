@@ -46,7 +46,7 @@ module Scenario
         "amazon_id" => "i-d4cdddbf",
         "public_hostname" => "db_master_hostname.compute-1.amazonaws.com",
       }, {
-        "name" => nil,
+        "name" => "Slave I",
         "role" => "db_slave",
         "status" => "running",
         "amazon_id" => "i-asdfasdfaj",

@@ -138,7 +138,7 @@ module EY
       end
 
       def hierarchy_name
-        "#{account_name}/#{name}"
+        [account_name, name].join(" / ")
       end
 
       def ssh_username=(user)
@@ -349,7 +349,11 @@ module EY
       end
 
       def load_instances(instances_attrs)
-        Instance.from_array(api, instances_attrs, 'environment' => self)
+        Instance.from_array(api, instances_attrs, 'environment' => self).sort
+      end
+
+      def sort_attributes
+        [sort_string(account_name), sort_string(name)]
       end
 
       # attrs["cluster_configuration"]["cluster"] can be 'single', 'cluster', or 'custom'

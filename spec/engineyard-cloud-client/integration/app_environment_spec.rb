@@ -34,6 +34,17 @@ describe EY::CloudClient::AppEnvironment do
     end
   end
 
+  describe "sorting" do
+    it "sorts app_envs by account, app, env" do
+      api = scenario_cloud_client "Multiple Ambiguous Accounts"
+      result = EY::CloudClient::AppEnvironment.resolve(api, 'app_name' => 'rails232app', 'environment_name' => 'giblets')
+      expect(result.matches.sort.map(&:hierarchy_name)).to eq([
+        "account_2 / rails232app / giblets",
+        "main / rails232app / giblets",
+      ])
+    end
+  end
+
   describe "model" do
     before do
       api = scenario_cloud_client "Multiple Ambiguous Accounts"
@@ -46,7 +57,7 @@ describe EY::CloudClient::AppEnvironment do
       @app_env.account_name.should == 'main'
       @app_env.app_name.should == 'rails232app'
       @app_env.environment_name.should == 'giblets'
-      @app_env.hierarchy_name.should == 'main/rails232app/giblets'
+      @app_env.hierarchy_name.should == 'main / rails232app / giblets'
       @app_env.repository_uri.should == 'user@git.host:path/to/repo.git'
     end
   end
