@@ -2,6 +2,10 @@
 
 ## NEXT
 
+  *
+
+## v1.0.14 (2013-09-04)
+
   * Add sorting comparator spaceship (&lt;=&gt;) to each of the models.
 
 ## v1.0.13 (2013-08-13)
