@@ -305,7 +305,8 @@ describe EY::CloudClient::Environment do
           'role' => 'util',
           'public_hostname' => 'some-hostname',
           'status' => 'running',
-          'amazon_id' => 'i-xxxxxxx'
+          'amazon_id' => 'i-xxxxxxx',
+          'name' => 'foo'
         },
         {
           'id' => 8675309,
@@ -382,6 +383,14 @@ describe EY::CloudClient::Environment do
         :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
       FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
     end
+
+    it "removes a util instance when name is supplied" do
+      i = @env.instance_by_id(54321) # util name "foo"
+      expect {
+        @env.remove_instance(i)
+      }.to_not raise_error
+      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+    end
   end
 
   describe "#add_instances(name: 'foo', role: 'app')" do
@@ -417,6 +426,18 @@ describe EY::CloudClient::Environment do
         @env.add_instance(:role => 'fake')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
       FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+    end
+
+    it "will raise if you specify util, but not name" do
+      expect {
+        @env.add_instance(:role => "util")
+      }.to raise_error EY::CloudClient::InvalidInstanceName
+    end
+
+    it "will raise with a blank name for util" do
+      expect {
+        @env.add_instance(:role => "util", :name => " ") # a space isn't a valid name, so test that too
+      }.to raise_error EY::CloudClient::InvalidInstanceName
     end
 
     it "sends a POST request to the API" do

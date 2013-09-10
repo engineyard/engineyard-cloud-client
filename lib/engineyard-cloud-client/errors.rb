@@ -9,6 +9,7 @@ module EY
     class InvalidInstanceRole    < Error; end
     class InstanceNotProvisioned < Error; end
     class MultipleMatchesError   < RequestFailed; end
+    class InvalidInstanceName    < Error; end
 
     class BadEndpointError < Error
       def initialize(endpoint)

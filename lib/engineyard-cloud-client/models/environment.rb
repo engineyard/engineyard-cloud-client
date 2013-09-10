@@ -219,10 +219,24 @@ module EY
       # Note that the role for an instance MUST be either "app" or "util".
       # No other value is acceptable. The "name" parameter can be anything,
       # but it only applies to utility instances.
+      #
+      # Note also that if you add a util instance, you *must* specify a
+      # name. This method will raise if you don't.
       def add_instance(opts)
         unless %w[app util].include?(opts[:role].to_s)
           # Fail immediately because we don't have valid arguments.
           raise InvalidInstanceRole, "Instance role must be one of: app, util"
+        end
+
+        # Sanitize the name to remove whitespace if there is any
+        if opts[:name]
+          name = opts[:name].gsub(/\s+/, '')
+        end
+
+        if opts[:role] == 'util'
+          unless name && name.length > 0
+            raise InvalidInstanceName, "When specifying a util instance you must also specify a name."
+          end
         end
 
         # We know opts[:role] is right, name can be passed straight to the API.
@@ -308,7 +322,8 @@ module EY
 
         response = api.post("/environments/#{id}/remove_instances", :request => {
           :provisioned_id => instance.amazon_id,
-          :role => instance.role
+          :role => instance.role,
+          :name => instance.name
         })
 
         # Reset instances so they are fresh if they are requested again.
