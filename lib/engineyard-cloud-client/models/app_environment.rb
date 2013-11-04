@@ -23,6 +23,38 @@ module EY
         ResolverResult.new(api, matches, response['errors'], response['suggestions'])
       end
 
+      # Accepts an api object, environment name and optional account name
+      # and returns the best matching environment for the given constraints.
+      #
+      # This is a shortcut for resolve_environments.
+      # Raises if nothing is found or if more than one environment is found.
+      def self.resolve_one(api, constraints)
+        resolver = resolve(api, constraints)
+
+        resolver.one_match { |match| return match  }
+
+        resolver.no_matches do |errors, suggestions|
+          message = nil
+          if suggestions.any?
+            message = "Suggestions found:\n"
+            suggestions.sourt_by{|suggest| [suggest['account_name'], suggest['app_name']] }.each do |suggest|
+              message << "\t#{suggest['account_name']}/#{suggest['app_name']}/#{suggest['env_name']}\n"
+            end
+          end
+
+          raise ResourceNotFound.new([errors,message].compact.join("\n").strip)
+        end
+
+        resolver.many_matches do |matches|
+          message = "Multiple app_environments possible, please be more specific:\n"
+          matches.sort_by {|ae| ae.app}.each do |ae|
+            message << "\t#{ae.hierarchy_name}\n"
+          end
+          raise MultipleMatchesError.new(message)
+        end
+      end
+
+
       def initialize(api, attrs)
         super
 
