@@ -7,7 +7,8 @@ require 'uri'
 module EY
   class CloudClient
     class Connection
-      attr_reader :token, :output, :user_agent, :endpoint
+      attr_reader :output, :user_agent, :endpoint
+      attr_accessor :token
 
       BASE_USER_AGENT = "EngineYardCloudClient/#{EY::CloudClient::VERSION}".freeze
       DEFAULT_ENDPOINT = "https://cloud.engineyard.com/".freeze
@@ -22,15 +23,11 @@ module EY
         @output     = options[:output] || $stdout
         @user_agent = [options[:user_agent], BASE_USER_AGENT].compact.join(' ').strip
         @endpoint   = URI.parse(options[:endpoint] || DEFAULT_ENDPOINT)
-        self.token  = options[:token]
+        @token      = options[:token]
 
         unless @endpoint.absolute?
           raise BadEndpointError.new(@endpoint)
         end
-      end
-
-      def token=(new_token)
-        @token = new_token
       end
 
       def debug(name, value)
