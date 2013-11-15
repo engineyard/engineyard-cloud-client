@@ -6,7 +6,9 @@
 
 ## v1.0.15 (2013-11-15)
 
-  *
+  * Add a `resolve_one` method to `AppEnvironment` to assist scripting
+  * Tighter requirement on `rest-client` gem. `1.6.0` does not actually work.
+  * Force instance addition with util to require a name, specify name when removing instances
 
 ## v1.0.14 (2013-09-04)
 
@@ -14,7 +16,13 @@
 
 ## v1.0.13 (2013-08-13)
 
-  *
+  * `Environment.by_name` using resolver
+  * `Environment#remove_instance` with a given instance object removes an instance via API
+  * Find instance by its AWSM id
+  * Find an environment by its name off the `api` object
+  * Add an instance to an environment
+  * Identify the license as MIT in the gemspec
+  * Make tests pass on travis
 
 ## v1.0.12 (2013-05-31)
 
