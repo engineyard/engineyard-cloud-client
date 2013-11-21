@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('rest-client', '~>1.6.1')
   s.add_dependency('multi_json', '~>1.6')
+  s.add_dependency('mime-types', '~>1.16') # The 2.0 version of mime-types doesn't work on 1.8.7
 
   s.add_development_dependency('rspec', '~>2.0')
   s.add_development_dependency('rake')
