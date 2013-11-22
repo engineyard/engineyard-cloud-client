@@ -2,6 +2,15 @@
 
 engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the [engineyard gem](https://github.com/engineyard/engineyard).
 
+## Version 2.0.x
+
+As of the 2.0 version series, we will only be supporting ruby versions 1.9.3 and
+greater. Supporting older versions of ruby has gotten increasingly difficult as
+more and more gems assume that everyone is using 1.9.3 or greater.
+
+The 1.0 version series will no longer be under active development, but will
+remain available through rubygems and on the 1-0-stable branch.
+
 ## Use at your own risk
 
 At this time, cloud-client is not documented for public use. It was created to
