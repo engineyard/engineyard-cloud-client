@@ -28,12 +28,14 @@ end
 # Please be aware that the monkeys like tho throw poo sometimes.
   EOF
 
-  new_version = if EY::CloudClient::VERSION =~ /\.pre$/
-                  EY::CloudClient::VERSION.gsub(/\.pre$/, '')
-                else
-                  digits = EY::CloudClient::VERSION.scan(/(\d+)/).map { |x| x.first.to_i }
+  new_version = if EY::CloudClient::VERSION =~ /^([0-9.]+)-[-0-9A-Za-z.]+$/
+                  $1
+                elsif EY::CloudClient::VERSION =~ /^([0-9.]+)$/
+                  digits = $1.scan(/(\d+)/).map { |x| x.first.to_i }
                   digits[-1] += 1
-                  digits.join('.') + ".pre"
+                  digits.join('.') + "-pre.1"
+                else
+                  raise "Version is weird: #{EY::CloudClient::VERSION.inspect}"
                 end
 
   puts "New version is #{new_version}"

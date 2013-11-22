@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("{lib}/**/*") + %w(LICENSE README.md ChangeLog.md)
   s.require_path = 'lib'
 
-  s.rubygems_version = %q{1.3.6}
   s.test_files = Dir.glob("spec/**/*")
 
   s.required_ruby_version = '>= 1.9.3'
