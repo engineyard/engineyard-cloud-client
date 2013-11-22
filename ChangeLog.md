@@ -2,6 +2,10 @@
 
 ## NEXT
 
+  *
+
+## v2.0.1 (2013-11-21)
+
   * Fix RbConfig deprecation warning
 
 ## v2.0.0 (2013-11-21)
