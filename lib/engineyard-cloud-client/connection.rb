@@ -11,7 +11,7 @@ module EY
       attr_reader :output, :user_agent, :endpoint
       attr_accessor :token
 
-      RUBY_VERSION_NAME = ::Config::CONFIG["RUBY_VERSION_NAME"] || "ruby-#{::RUBY_VERSION}"
+      RUBY_VERSION_NAME = ::RbConfig::CONFIG["RUBY_VERSION_NAME"] || "ruby-#{::RUBY_VERSION}"
       BASE_USER_AGENT = "EngineYardCloudClient/#{EY::CloudClient::VERSION} (#{::RUBY_PLATFORM}; #{RUBY_VERSION_NAME})".freeze
       DEFAULT_ENDPOINT = "https://cloud.engineyard.com/".freeze
 
