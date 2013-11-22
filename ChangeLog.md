@@ -4,6 +4,10 @@
 
   *
 
+## v2.0.0 (2013-11-21)
+
+  *
+
 ## v1.0.15 (2013-11-15)
 
   * Add a `resolve_one` method to `AppEnvironment` to assist scripting
