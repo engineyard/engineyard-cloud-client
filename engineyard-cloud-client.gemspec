@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('dm-timestamps')
   s.add_development_dependency('dm-sqlite-adapter')
   s.add_development_dependency('ey_resolver', '~>0.2.1')
-  s.add_development_dependency('rabl')
+  s.add_development_dependency('rabl', '~>0.8.0')
   s.add_development_dependency('activesupport', '< 4.0.0')
   s.add_development_dependency('oj')
   s.add_development_dependency('pry')
