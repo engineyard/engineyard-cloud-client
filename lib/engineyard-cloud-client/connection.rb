@@ -3,6 +3,7 @@ require 'engineyard-cloud-client/rest_client_ext'
 require 'engineyard-cloud-client/errors'
 require 'multi_json'
 require 'uri'
+require 'rbconfig'
 
 module EY
   class CloudClient
@@ -10,7 +11,8 @@ module EY
       attr_reader :output, :user_agent, :endpoint
       attr_accessor :token
 
-      BASE_USER_AGENT = "EngineYardCloudClient/#{EY::CloudClient::VERSION}".freeze
+      RUBY_VERSION_NAME = ::Config::CONFIG["RUBY_VERSION_NAME"] || "ruby-#{::RUBY_VERSION}"
+      BASE_USER_AGENT = "EngineYardCloudClient/#{EY::CloudClient::VERSION} (#{::RUBY_PLATFORM}; #{RUBY_VERSION_NAME})".freeze
       DEFAULT_ENDPOINT = "https://cloud.engineyard.com/".freeze
 
       # Initialize a new EY::CloudClient::Connection with a hash including:
