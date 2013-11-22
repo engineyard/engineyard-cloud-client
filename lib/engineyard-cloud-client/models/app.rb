@@ -67,6 +67,10 @@ module EY
         [sort_string(account_name), sort_string(name)]
       end
 
+      def hierarchy_name
+        [account_name, name].join(' / ')
+      end
+
       protected
 
       def set_account(account_attrs)

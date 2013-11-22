@@ -53,6 +53,7 @@ describe EY::CloudClient::App do
 
       app.name.should == "myapp"
       app.account.name.should == "myaccount"
+      app.hierarchy_name.should == "myaccount / myapp"
     end
   end
 end
