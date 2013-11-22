@@ -2,11 +2,12 @@
 
 ## NEXT
 
-  *
+  * Fix RbConfig deprecation warning
 
 ## v2.0.0 (2013-11-21)
 
   * Ruby `>= 1.9.3` only.
+  * Send `RUBY_PLATFORM` and `RUBY_VERSION` with the User-Agent string to make upgrades easiear in the future.
 
 ## v1.0.15 (2013-11-15)
 
