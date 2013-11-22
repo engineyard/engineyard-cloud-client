@@ -14,3 +14,4 @@ notifications:
 branches:
   only:
     - master
+    - 1-0-stable
