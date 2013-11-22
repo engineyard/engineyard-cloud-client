@@ -2,6 +2,10 @@
 
 ## NEXT
 
+  *
+
+## v1.0.16 (2013-11-22)
+
   * Attempt to support ruby 1.8.7 by restricting the versions of gems that fail.
 
 ## v1.0.15 (2013-11-15)
