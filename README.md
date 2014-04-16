@@ -136,6 +136,10 @@ Valid `app_server_stack_name` values: `nginx_unicorn, nginx_passenger3, nginx_no
 
 Instances:
 
+    # filtering by roles and roles with names
+    env.instances_by_role(:app_master, :app, :util) # => [EY::CloudClient::Instance, ...]
+    env.select_instances(util: %w[resque1 resque2 redis])  # => [EY::CloudClient::Instance, ...]
+
     instance = env.instances.first
     instance.class        # => EY::CloudClient::Instance
     instance.id           # => 12345

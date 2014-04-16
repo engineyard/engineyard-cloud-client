@@ -100,15 +100,94 @@ describe EY::CloudClient::Environment do
       @env.deploy_to_instances.map(&:role).should =~ %w[app_master app util util]
     end
 
+    def expect_instances(instances)
+      expect(instances.map { |i| [i.role, i.name, i.public_hostname] })
+    end
+
     it "sorts instances" do
-      expect(@env.instances.map do |i|
-        [i.role,       i.name,                                i.public_hostname]
-      end).to eq([
+      expect_instances(@env.instances).to eq([
         ["app_master", nil,       "app_master_hostname.compute-1.amazonaws.com"],
         ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
         ["db_master",  nil,        "db_master_hostname.compute-1.amazonaws.com"],
         ["db_slave",   "Slave I", "db_slave_1_hostname.compute-1.amazonaws.com"],
         ["db_slave",   nil,       "db_slave_2_hostname.compute-1.amazonaws.com"],
+        ["util" ,      "fluffy", "util_fluffy_hostname.compute-1.amazonaws.com"],
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "finds no instances by role solo" do
+      expect(@env.select_instances(solo: true)).to be_empty
+    end
+
+    it "selects instances by solo, app, app_master" do
+      expect_instances(@env.select_instances(solo: true, app: true, app_master: true)).to eq([
+        ["app_master", nil,       "app_master_hostname.compute-1.amazonaws.com"],
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by solo, app, app_master, util" do
+      expect_instances(@env.select_instances(solo: true, app: true, app_master: true, util: true)).to eq([
+        ["app_master", nil,       "app_master_hostname.compute-1.amazonaws.com"],
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
+        ["util" ,      "fluffy", "util_fluffy_hostname.compute-1.amazonaws.com"],
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by util with name string" do
+      expect_instances(@env.select_instances(util: "rocky")).to eq([
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by util with name array" do
+      expect_instances(@env.select_instances(util: %w[fluffy rocky])).to eq([
+        ["util" ,      "fluffy", "util_fluffy_hostname.compute-1.amazonaws.com"],
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by solo, app, or util with name string" do
+      expect_instances(@env.select_instances(solo: true, app: true, util: "rocky")).to eq([
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
+        ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by solo, db_master, db_slave" do
+      expect_instances(@env.select_instances(solo: true, db_master: true, db_slave: true)).to eq([
+        ["db_master",  nil,        "db_master_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   "Slave I", "db_slave_1_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   nil,       "db_slave_2_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "finds instances by role solo, db_master, or db_slave with the specified name only" do
+      expect_instances(@env.select_instances(solo: true, db_master: true, db_slave: "Slave I")).to eq([
+        ["db_master",  nil,        "db_master_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   "Slave I", "db_slave_1_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "finds instances by role solo, db_master, or db_slave with blank name only" do
+      expect_instances(@env.select_instances(solo: true, db_master: true, db_slave: "")).to eq([
+        ["db_master",  nil,        "db_master_hostname.compute-1.amazonaws.com"],
+        ["db_slave",   nil,       "db_slave_2_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "selects instances by app, excluding app_master" do
+      expect_instances(@env.select_instances(app: true, app_master: false)).to eq([
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
+      ])
+    end
+
+    it "finds solo, app, app_master, util" do
+      expect_instances(@env.instances_by_role(:solo, :app, :app_master, :util)).to eq([
+        ["app_master", nil,       "app_master_hostname.compute-1.amazonaws.com"],
+        ["app",        nil,              "app_hostname.compute-1.amazonaws.com"],
         ["util" ,      "fluffy", "util_fluffy_hostname.compute-1.amazonaws.com"],
         ["util",       "rocky",   "util_rocky_hostname.compute-1.amazonaws.com"],
       ])

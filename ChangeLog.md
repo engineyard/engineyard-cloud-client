@@ -2,6 +2,7 @@
 
 ## NEXT
 
+  * `Environment#instances_by_role` and `Environment#select_instances` for filtering instances by role and name.
   * Add `App#hierarchy_name` which returns a nice string representation of the application hierchy: `account / app`
 
 ## v2.0.1 (2013-11-21)

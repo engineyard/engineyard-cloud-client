@@ -170,6 +170,46 @@ module EY
         bridge
       end
 
+      # Select instances by role, with optional name constraints.
+      #
+      # Select the "master" app instance:
+      # select_instances(app_master: true)
+      #
+      # Select the "master" db instance on a solo or multi-instance env:
+      # select_instances(solo: true, db_master: true)
+      #
+      # Select app, app_master, or utils (only if they are named resque or redis):
+      # select_instances(app_master: true, app: true, util: %w[resque redis])
+      #
+      # Select all instances (same as the method #instances):
+      # select_instances(all: true)
+      #
+      # See #instances_by_role for a simpler interface.
+      def select_instances(options)
+        instances_by_role(options.keys).select do |inst|
+          # get the value of the string/symbol key that matches without losing nil/false values
+          val = options.fetch(inst.role.to_sym) { options.fetch(inst.role.to_s, false) }
+
+          case val
+          when true, false then val
+          when inst.name   then true
+          when nil, ''     then [nil, ''].include?(inst.name)
+          when Array       then val.include?(inst.name)
+          else                  false
+          end
+        end
+      end
+
+      # Simple version of select_instances that only selects roles, not names
+      #   instances_by_role(:app_master, :app) # same
+      #   instances_by_role(%w[app_master app]) # same
+      #   select_instances(app_master: true, app: true) # same
+      #
+      def instances_by_role(*roles)
+        roles = roles.flatten.map(&:to_s)
+        instances.select { |inst| roles.include?(inst.role.to_s) }
+      end
+
       def update
         api.put("/environments/#{id}/update_instances")
         true # raises on failure
