@@ -2,6 +2,8 @@
 
 engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the [engineyard gem](https://github.com/engineyard/engineyard).
 
+[![Build Status](https://travis-ci.org/engineyard/engineyard-cloud-client.svg?branch=master)](https://travis-ci.org/rest-client/rest-client)
+
 ## Version 2.0.x
 
 As of the 2.0 version series, we will only be supporting ruby versions 1.9.3 and

@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 1.9.3'
 
-  s.add_dependency('rest_client', '~>1.8')
+  s.add_dependency('rest-client', '~>1.7')
   s.add_dependency('multi_json', '~>1.6')
 
   s.add_development_dependency('rspec', '~>2.0')
