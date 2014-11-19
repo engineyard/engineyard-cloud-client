@@ -2,7 +2,7 @@
 
 ## NEXT
 
-  *
+  * Fix SSL version detection by requiring a newer verion of RestClient.
 
 ## v2.1.0 (2014-04-16)
 
