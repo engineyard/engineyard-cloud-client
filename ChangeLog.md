@@ -6,10 +6,11 @@
 
 ## v2.1.1 (2014-11-19)
 
-  * Fix SSL version detection by requiring a newer verion of RestClient.
+  * Switch which version of rest client we use. The gem name only varied by a `-` vs `_`
 
 ## v2.1.0 (2014-04-16)
 
+  * Fix SSL version detection by requiring a newer verion of RestClient.
   * `Environment#instances_by_role` and `Environment#select_instances` for filtering instances by role and name.
   * Add `App#hierarchy_name` which returns a nice string representation of the application hierchy: `account / app`
 
