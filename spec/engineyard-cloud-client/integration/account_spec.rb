@@ -9,7 +9,7 @@ describe EY::CloudClient::Account do
     it "returns all accounts" do
       api = scenario_cloud_client "Multiple Ambiguous Accounts"
       accounts = EY::CloudClient::Account.all(api)
-      accounts.should have(2).account
+      expect(accounts.size).to eq(2)
       expect(accounts.sort).to eq([
         accounts.find { |account| account.name == 'account_2' },
         accounts.find { |account| account.name == 'main' },

@@ -9,7 +9,7 @@ describe EY::CloudClient::AppEnvironment do
     before do
       @api = scenario_cloud_client "Multiple Ambiguous Accounts"
       result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
-      result.should be_one_match
+      expect(result).to be_one_match
       @app_env = result.matches.first
     end
 
@@ -21,38 +21,38 @@ describe EY::CloudClient::AppEnvironment do
         :extra_config    => {'extra' => 'config'},
         :serverside_version => '2.0.3',
       })
-      deployment.commit.should be_nil
-      deployment.resolved_ref.should be_nil
-      deployment.serverside_version.should == '2.0.3'
+      expect(deployment.commit).to be_nil
+      expect(deployment.resolved_ref).to be_nil
+      expect(deployment.serverside_version).to eq('2.0.3')
 
-      deployment.created_at.should be_nil
-      deployment.finished_at.should be_nil
+      expect(deployment.created_at).to be_nil
+      expect(deployment.finished_at).to be_nil
 
       deployment.start
 
-      deployment.created_at.should_not be_nil
-      deployment.finished_at.should be_nil
-      deployment.config.should == {'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
-      deployment.commit.should =~ /[0-9a-f]{40}/
-      deployment.resolved_ref.should_not be_nil
+      expect(deployment.created_at).not_to be_nil
+      expect(deployment.finished_at).to be_nil
+      expect(deployment.config).to eq({'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'})
+      expect(deployment.commit).to match(/[0-9a-f]{40}/)
+      expect(deployment.resolved_ref).not_to be_nil
       deployment.out << "Test output"
       deployment.out << "Test error"
       deployment.successful = true
 
       deployment.finished
 
-      deployment.should be_finished
-      deployment.created_at.should be_within(5).of(Time.now)
-      deployment.finished_at.should be_within(5).of(Time.now)
+      expect(deployment).to be_finished
+      expect(deployment.created_at).to be_within(5).of(Time.now)
+      expect(deployment.finished_at).to be_within(5).of(Time.now)
 
       found_dep = @app_env.last_deployment
-      found_dep.id.should == deployment.id
-      found_dep.should be_finished
-      found_dep.serverside_version.should == '2.0.3'
+      expect(found_dep.id).to eq(deployment.id)
+      expect(found_dep).to be_finished
+      expect(found_dep.serverside_version).to eq('2.0.3')
     end
 
     it "returns nil when a not found deployment is requested" do
-      EY::CloudClient::Deployment.get(@api, @app_env, 0).should be_nil
+      expect(EY::CloudClient::Deployment.get(@api, @app_env, 0)).to be_nil
     end
   end
 
@@ -60,7 +60,7 @@ describe EY::CloudClient::AppEnvironment do
     before do
       @api = scenario_cloud_client "Multiple Ambiguous Accounts"
       result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
-      result.should be_one_match
+      expect(result).to be_one_match
       @app_env = result.matches.first
     end
 
@@ -71,17 +71,17 @@ describe EY::CloudClient::AppEnvironment do
         :migrate_command => 'rake migrate',
         :extra_config    => {'extra' => 'config'},
       })
-      deployment.config.should == {'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'}
-      deployment.commit.should =~ /[0-9a-f]{40}/
-      deployment.resolved_ref.should_not be_nil
-      deployment.created_at.should_not be_nil
-      deployment.finished_at.should_not be_nil
-      deployment.should be_finished
+      expect(deployment.config).to eq({'input_ref' => 'master', 'deployed_by' => 'Multiple Ambiguous Accounts', 'extra' => 'config'})
+      expect(deployment.commit).to match(/[0-9a-f]{40}/)
+      expect(deployment.resolved_ref).not_to be_nil
+      expect(deployment.created_at).not_to be_nil
+      expect(deployment.finished_at).not_to be_nil
+      expect(deployment).to be_finished
 
       found_dep = @app_env.last_deployment
-      found_dep.id.should == deployment.id
-      found_dep.should be_finished
-      found_dep.serverside_version.should == '2.0.0.awsm' # uses the awsm version if one is not sent.
+      expect(found_dep.id).to eq(deployment.id)
+      expect(found_dep).to be_finished
+      expect(found_dep.serverside_version).to eq('2.0.0.awsm') # uses the awsm version if one is not sent.
     end
   end
 
@@ -89,12 +89,12 @@ describe EY::CloudClient::AppEnvironment do
     before do
       @api = scenario_cloud_client "Linked App"
       result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
-      result.should be_one_match
+      expect(result).to be_one_match
       @app_env = result.matches.first
     end
 
     it "returns nil when there have been no deployments" do
-      EY::CloudClient::Deployment.last(@api, @app_env).should be_nil
+      expect(EY::CloudClient::Deployment.last(@api, @app_env)).to be_nil
     end
 
     it "returns the last deployment when there has been at least one" do
@@ -107,7 +107,7 @@ describe EY::CloudClient::AppEnvironment do
       deployment.out << "Test output"
       deployment.successful = true
       deployment.finished
-      EY::CloudClient::Deployment.last(@api, @app_env).should == deployment
+      expect(EY::CloudClient::Deployment.last(@api, @app_env)).to eq(deployment)
     end
   end
 
@@ -115,20 +115,20 @@ describe EY::CloudClient::AppEnvironment do
     before do
       @api = scenario_cloud_client "Stuck Deployment"
       result = EY::CloudClient::AppEnvironment.resolve(@api, 'app_name' => 'rails232app', 'environment_name' => 'giblets', 'account_name' => 'main')
-      result.should be_one_match
+      expect(result).to be_one_match
       @app_env = result.matches.first
     end
 
     it "marks the deployment finish and unsuccessful with a message" do
       deployment = EY::CloudClient::Deployment.last(@api, @app_env)
-      deployment.should_not be_finished
+      expect(deployment).not_to be_finished
       deployment.timeout
-      deployment.should be_finished
-      deployment.should_not be_successful
+      expect(deployment).to be_finished
+      expect(deployment).not_to be_successful
       deployment.output.rewind
-      deployment.output.read.should =~ /Marked as timed out by Stuck Deployment/
+      expect(deployment.output.read).to match(/Marked as timed out by Stuck Deployment/)
 
-      EY::CloudClient::Deployment.last(@api, @app_env).should be_finished
+      expect(EY::CloudClient::Deployment.last(@api, @app_env)).to be_finished
     end
 
     it "raises if the deployment is already finished" do
@@ -136,7 +136,7 @@ describe EY::CloudClient::AppEnvironment do
       deployment.out << "Test output"
       deployment.successful = true
       deployment.finished
-      deployment.should be_finished
+      expect(deployment).to be_finished
       expect { deployment.timeout }.to raise_error(EY::CloudClient::Error, "Previous deployment is already finished. Aborting.")
     end
   end

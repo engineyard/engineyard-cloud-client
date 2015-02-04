@@ -40,8 +40,8 @@ describe EY::CloudClient::Environment do
 
       environments = EY::CloudClient::Environment.all(cloud_client)
 
-      environments.length.should == 1
-      environments.first.name.should == "myapp_production"
+      expect(environments.length).to eq(1)
+      expect(environments.first.name).to eq("myapp_production")
     end
   end
 
@@ -88,11 +88,11 @@ describe EY::CloudClient::Environment do
         "app_server_stack_name" => 'nginx_thin',
         "region"                => 'us-west-1'
       })
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
 
-      env.name.should == "myapp_production"
-      env.account.name.should == "myaccount"
-      env.apps.to_a.first.name.should == "myapp"
+      expect(env.name).to eq("myapp_production")
+      expect(env.account.name).to eq("myaccount")
+      expect(env.apps.to_a.first.name).to eq("myapp")
     end
 
     it "hits the create action and requests a solo instance booted" do
@@ -154,11 +154,11 @@ describe EY::CloudClient::Environment do
           "configuration" => "solo"
         }
       })
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
 
-      env.name.should == "myapp_production"
-      env.instances.count.should == 1
-      env.bridge.role.should == "solo"
+      expect(env.name).to eq("myapp_production")
+      expect(env.instances.count).to eq(1)
+      expect(env.bridge.role).to eq("solo")
     end
   end
 
@@ -174,7 +174,7 @@ describe EY::CloudClient::Environment do
 
       env.rebuild
 
-      FakeWeb.should have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances")
+      expect(FakeWeb).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances")
     end
   end
 
@@ -191,7 +191,7 @@ describe EY::CloudClient::Environment do
 
       env.run_custom_recipes
 
-      FakeWeb.should have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes")
+      expect(FakeWeb).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes")
     end
   end
 
@@ -216,8 +216,8 @@ describe EY::CloudClient::Environment do
         :content_type => 'application/json'
       )
 
-      env.should have(1).instances
-      env.instances.first.should == EY::CloudClient::Instance.from_hash(cloud_client, instance_data.merge('environment' => env))
+      expect(env.instances.size).to eq(1)
+      expect(env.instances.first).to eq(EY::CloudClient::Instance.from_hash(cloud_client, instance_data.merge('environment' => env)))
     end
   end
 
@@ -242,29 +242,29 @@ describe EY::CloudClient::Environment do
 
     it "returns the bridge if it's present and running" do
       env = make_env_with_bridge("status" => "running")
-      env.bridge!.should_not be_nil
-      env.bridge!.id.should == 44206
+      expect(env.bridge!).not_to be_nil
+      expect(env.bridge!.id).to eq(44206)
     end
 
     it "raises an error if the bridge is in a non-running state" do
       env = make_env_with_bridge("status" => "error")
-      lambda {
+      expect {
         env.bridge!
-      }.should raise_error(EY::CloudClient::BadBridgeStatusError)
+      }.to raise_error(EY::CloudClient::BadBridgeStatusError)
     end
 
     it "returns the bridge if told to ignore the bridge being in a non-running state" do
       env = make_env_with_bridge("status" => "error")
       ignore_bad_bridge = true
-      env.bridge!(ignore_bad_bridge).should_not be_nil
-      env.bridge!(ignore_bad_bridge).id.should == 44206
+      expect(env.bridge!(ignore_bad_bridge)).not_to be_nil
+      expect(env.bridge!(ignore_bad_bridge).id).to eq(44206)
     end
 
     it "raises an error if the bridge has fallen down" do
       env = make_env_with_bridge(nil)
-      lambda {
+      expect {
         env.bridge!
-      }.should raise_error(EY::CloudClient::NoBridgeError)
+      }.to raise_error(EY::CloudClient::NoBridgeError)
     end
   end
 
@@ -276,19 +276,19 @@ describe EY::CloudClient::Environment do
     end
 
     it "turns myapp+myapp_production to production" do
-      short('myapp_production', 'myapp').should == 'production'
+      expect(short('myapp_production', 'myapp')).to eq('production')
     end
 
     it "turns product+production to production (leaves it alone)" do
-      short('production', 'product').should == 'production'
+      expect(short('production', 'product')).to eq('production')
     end
 
     it "leaves the environment name alone when the app name appears in the middle" do
-      short('hattery', 'ate').should == 'hattery'
+      expect(short('hattery', 'ate')).to eq('hattery')
     end
 
     it "does not produce an empty string when the names are the same" do
-      short('dev', 'dev').should == 'dev'
+      expect(short('dev', 'dev')).to eq('dev')
     end
   end
 
@@ -349,7 +349,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i) # db_master, should fail
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "raises an error if the instance isn't provisioned yet" do
@@ -357,7 +357,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i) # app, but not provisioned and no amazon id
       }.to raise_error EY::CloudClient::InstanceNotProvisioned
-      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "sends an API request when things check out" do
@@ -365,7 +365,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i)
       }.to_not raise_error
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "does the same thing when Instance#remove helper method is used instead" do
@@ -373,7 +373,7 @@ describe EY::CloudClient::Environment do
       expect {
         i.remove
       }.to_not raise_error
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "reloads the instances after a remove request" do
@@ -381,7 +381,7 @@ describe EY::CloudClient::Environment do
       @instances_response.pop
       FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
         :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
-      FakeWeb.should have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
+      expect(FakeWeb).to have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
     end
 
     it "removes a util instance when name is supplied" do
@@ -389,7 +389,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i)
       }.to_not raise_error
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
   end
 
@@ -418,14 +418,14 @@ describe EY::CloudClient::Environment do
       expect {
         @env.add_instance(:name => 'foo')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "will raise if role isn't either app or util" do
       expect {
         @env.add_instance(:role => 'fake')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      FakeWeb.should_not have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "will raise if you specify util, but not name" do
@@ -442,12 +442,12 @@ describe EY::CloudClient::Environment do
 
     it "sends a POST request to the API" do
       @env.add_instance(:role => "app")
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "returns the API's response body" do
-      @env.add_instance(:role => "util", :name => "blah").should_not be_nil
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(@env.add_instance(:role => "util", :name => "blah")).not_to be_nil
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
   end
 
@@ -473,11 +473,11 @@ describe EY::CloudClient::Environment do
     end
 
     it "returns one instance when called with a valid id" do
-      @env.instance_by_id(12345).should_not be_nil
+      expect(@env.instance_by_id(12345)).not_to be_nil
     end
 
     it "returns nil when called with a non-existent id" do
-      @env.instance_by_id(54321).should be_nil
+      expect(@env.instance_by_id(54321)).to be_nil
     end
   end
 end

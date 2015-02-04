@@ -20,8 +20,8 @@ describe EY::CloudClient::App do
 
       apps = EY::CloudClient::App.all(cloud_client)
 
-      apps.length.should == 1
-      apps.first.name.should == "myapp"
+      expect(apps.length).to eq(1)
+      expect(apps.first.name).to eq("myapp")
     end
   end
 
@@ -49,11 +49,11 @@ describe EY::CloudClient::App do
         "app_type_id"    => 'rails3'
       })
 
-      FakeWeb.should have_requested(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps")
+      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps")
 
-      app.name.should == "myapp"
-      app.account.name.should == "myaccount"
-      app.hierarchy_name.should == "myaccount / myapp"
+      expect(app.name).to eq("myapp")
+      expect(app.account.name).to eq("myaccount")
+      expect(app.hierarchy_name).to eq("myaccount / myapp")
     end
   end
 end

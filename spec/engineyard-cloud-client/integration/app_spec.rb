@@ -9,16 +9,16 @@ describe EY::CloudClient::App do
     it "finds all the apps" do
       api = scenario_cloud_client "One App Many Envs"
       apps = EY::CloudClient::App.all(api)
-      apps.size.should == 1
+      expect(apps.size).to eq(1)
       app = apps.first
-      app.name.should == 'rails232app'
+      expect(app.name).to eq('rails232app')
     end
 
     it "includes environments in all apps" do
       api = scenario_cloud_client "One App Many Envs"
       app = api.apps.first
-      app.environments.size.should == 2
-      app.environments.sort.map(&:name).should =~ %w[bakon giblets]
+      expect(app.environments.size).to eq(2)
+      expect(app.environments.sort.map(&:name)).to match_array(%w[bakon giblets])
     end
   end
 

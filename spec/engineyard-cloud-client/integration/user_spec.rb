@@ -8,9 +8,9 @@ describe EY::CloudClient::User do
   it "loads current user and returns all accounts" do
     api = scenario_cloud_client "User Name"
     user = api.current_user
-    user.name.should == 'User Name'
-    user.accounts.size.should == 1
-    user.accounts.first.name.should == 'main'
+    expect(user.name).to eq('User Name')
+    expect(user.accounts.size).to eq(1)
+    expect(user.accounts.first.name).to eq('main')
   end
 
   it "has keypairs" do
@@ -19,7 +19,7 @@ describe EY::CloudClient::User do
         "name"       => 'laptop',
         "public_key" => "ssh-rsa OTHERKEYPAIR"
     })
-    api.current_user.keypairs.should include(keypair)
+    expect(api.current_user.keypairs).to include(keypair)
     keypair.destroy
   end
 end

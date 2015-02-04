@@ -12,11 +12,11 @@ describe EY::CloudClient::Keypair do
         "public_key" => "ssh-rsa OTHERKEYPAIR"
     })
 
-    keypair.name.should == "laptop"
-    keypair.public_key.should == "ssh-rsa OTHERKEYPAIR"
+    expect(keypair.name).to eq("laptop")
+    expect(keypair.public_key).to eq("ssh-rsa OTHERKEYPAIR")
 
     keypairs = EY::CloudClient::Keypair.all(api)
-    keypairs.should =~ [keypair]
+    expect(keypairs).to match_array([keypair])
 
     keypair.destroy
   end
