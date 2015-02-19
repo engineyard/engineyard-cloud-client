@@ -298,7 +298,8 @@ module EY
         # Return the response body for error output, logging, etc.
         return api.post("/environments/#{id}/add_instances", :request => {
           "role" => opts[:role],
-          "name" => opts[:name]
+          "name" => opts[:name],
+          "snapshot_id" => opts[:snapshot_id]
         })
       end
 
