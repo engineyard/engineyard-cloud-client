@@ -9,6 +9,7 @@ module EY
     require 'engineyard-cloud-client/models/log'
     require 'engineyard-cloud-client/models/instance'
     require 'engineyard-cloud-client/models/keypair'
+    require 'engineyard-cloud-client/models/snapshot'
     require 'engineyard-cloud-client/models/user'
   end
 end

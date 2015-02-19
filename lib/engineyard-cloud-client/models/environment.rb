@@ -5,6 +5,7 @@ require 'engineyard-cloud-client/models/app_environment'
 require 'engineyard-cloud-client/models/instance'
 require 'engineyard-cloud-client/models/log'
 require 'engineyard-cloud-client/models/recipes'
+require 'engineyard-cloud-client/models/snapshot'
 require 'engineyard-cloud-client/resolver_result'
 require 'engineyard-cloud-client/errors'
 
@@ -136,7 +137,21 @@ module EY
       def account_name
         account && account.name
       end
-
+      
+      def snapshots
+        @snapshots ||= request_snapshots
+      end
+      
+      def utility_snapshots(name = nil)
+        snapshots.select do |snapshot|
+          snapshot.role == 'utility' && (name.nil? || name[/^#{name}/])
+        end
+      end
+      
+      def newest_utility_snapshot(name = nil)
+        utility_snapshots(name).first
+      end
+      
       def hierarchy_name
         [account_name, name].join(" / ")
       end
@@ -405,6 +420,10 @@ module EY
 
       def load_instances(instances_attrs)
         Instance.from_array(api, instances_attrs, 'environment' => self).sort
+      end
+      
+      def request_snapshots
+        Snapshot.all(api, self)
       end
 
       def sort_attributes
