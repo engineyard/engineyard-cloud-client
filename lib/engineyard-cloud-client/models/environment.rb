@@ -293,13 +293,14 @@ module EY
             raise InvalidInstanceName, "When specifying a util instance you must also specify a name."
           end
         end
+        
+        request = { "role" => opts[:role], "name" => opts[:name] }
+        request['snapshot_id'] = opts[:snapshot_id] if opts.key?(:snapshot_id)
+        request['instance_size'] = opts[:instance_size] if opts.key?(:instance_size)
 
         # We know opts[:role] is right, name can be passed straight to the API.
         # Return the response body for error output, logging, etc.
-        return api.post("/environments/#{id}/add_instances", :request => {
-          "role" => opts[:role],
-          "name" => opts[:name]
-        })
+        return api.post("/environments/#{id}/add_instances", :request => request)
       end
 
       #
