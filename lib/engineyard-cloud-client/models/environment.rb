@@ -144,7 +144,7 @@ module EY
       
       def utility_snapshots(name = nil)
         snapshots.select do |snapshot|
-          snapshot.role == 'utility' && (name.nil? || name[/^#{name}/])
+          snapshot.role == 'utility' && (name.nil? || snapshot.name[/^#{name}/])
         end
       end
       
