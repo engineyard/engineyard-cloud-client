@@ -12,7 +12,6 @@ module EY
       def self.all(api, environment)
         uri = api_root(environment.id)
         response = api.get(uri)
-        puts response.inspect
         self.from_array(api, load_snapshots(response['snapshots']))
       end
       
@@ -21,7 +20,8 @@ module EY
       def self.load_snapshots(response)
         response.map do |(role, snapshots)|
           snapshots.map do |snapshot| 
-            snapshot.merge(role: role[/^[^\[]+/], name: role[/\[([^\]]+)\]$/, 1])
+            attributes = snapshot.merge(role: role[/^[^\[]+/], name: role[/\[([^\]]+)\]$/, 1])
+            attributes
           end
         end.flatten
       end
