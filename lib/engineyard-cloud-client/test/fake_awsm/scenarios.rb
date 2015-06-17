@@ -220,6 +220,14 @@ module Scenario
         "app_server_stack_name" => "nginx_passenger",
         "load_balancer_ip_address" => '127.0.0.0',
       })
+
+      @snap1 = @env1.snapshots.create({
+        "role" => "db",
+        "arch" => 64,
+        "size" => 15,
+        "amazon_id" => "abc123-xyz",
+        "name" => "db_replica",
+      })
     end
   end # OneAppTwoEnvs
 

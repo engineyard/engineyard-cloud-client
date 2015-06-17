@@ -277,6 +277,16 @@ module EY
       #
       # Note also that if you add a util instance, you *must* specify a
       # name. This method will raise if you don't.
+      #
+      # Instance sizes are documented at
+      # https://support.cloud.engineyard.com/hc/en-us/articles/205413998-Add-an-Instance
+      #
+      # List:
+      #   small, small_64, medium_ram, medium_ram_64, medium_cpu, medium_cpu_64,
+      #   large, xlarge, xlarge_cpu, xlarge_ram, doublexlarge_ram,
+      #   quadxlarge_ram, quadxlarge_io.
+
+
       def add_instance(opts)
         unless %w[app util].include?(opts[:role].to_s)
           # Fail immediately because we don't have valid arguments.
