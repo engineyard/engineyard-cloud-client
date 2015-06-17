@@ -176,6 +176,14 @@ Instances:
     bad_instance = env.instance_by_id(12345) # instance ID according to API
     env.remove_instance(bad_instance)
 
+    #
+    # valid instance sizes (or, "how do I add a 64-bit medium_cpu for example?")
+    # This is also documented at
+    # https://support.cloud.engineyard.com/hc/en-us/articles/205413998-Add-an-Instance
+    #
+    EY::CloudClient::Instance.valid_sizes
+    => [... array of valid instance sizes/names ...]
+
 Snapshots:
 
     # Assuming you've authenticated with an object named 'api'...
