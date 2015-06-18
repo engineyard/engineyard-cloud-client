@@ -40,13 +40,13 @@ Setup:
 
     require 'engineyard-cloud-client'
 
-    api = EY::CloudClient.new
+    ey_api = EY::CloudClient.new
 
     # the api object will retain the token after authenticate is called
-    token = api.authenticate("your@email.com", "password")
+    token = api.authenticate!("your@email.com", "password")
 
     # or, if you already have the token
-    api = EY::CloudClient.new(token: api_token)
+    ey_api = EY::CloudClient.new(token: api_token)
 
 
 Current User:
@@ -150,6 +150,49 @@ Instances:
     instance.amazon_id    # => "i-abcdefg"
     instance.hostname     # => "ec2-1-2-3-4.compute-1.amazonaws.com"
     instance.public_hostname # => "ec2-1-2-3-4.compute-1.amazonaws.com" # alias of hostname
+
+    #
+    # add an instance
+    # IMPORTANT: See comments in code at 
+    # lib/engineyard-cloud-client/models/environment.rb#add_instance(opts)
+    # caveats may apply now and/or in the future
+    # 
+    api = EY::CloudClient.new(token: 'my token')
+    env = api.environment_by_name("myenv")
+
+    env.add_instance(role: "app") # adds app instance to cluster
+    env.add_instance(role: "util", name: "sphinx") # adds util named "sphinx"
+
+    # 
+    # remove an instance
+    # IMPORTANT: See comments in code at
+    # lib/engineyard-cloud-client/models/environment.rb#remove_instance(instance)
+    # There are certain cases where this may not exactly do what you want,
+    # depending on how you call this, the state of your environment at
+    # runtime, and the IaaS on the other end.
+    #
+    api = EY::CloudClient.new(token: 'my token')
+    env = api.environment_by_name("myenv")
+    bad_instance = env.instance_by_id(12345) # instance ID according to API
+    env.remove_instance(bad_instance)
+
+    #
+    # valid instance sizes (or, "how do I add a 64-bit medium_cpu for example?")
+    # This is also documented at
+    # https://support.cloud.engineyard.com/hc/en-us/articles/205413998-Add-an-Instance
+    #
+    EY::CloudClient::Instance.valid_sizes
+    => [... array of valid instance sizes/names ...]
+
+Snapshots:
+
+    # Assuming you've authenticated with an object named 'api'...
+    env = (api.environments.select { |x| x.name == "my_uniqe_env_name"}).first
+    env.snapshots
+    # big list of all environment snapshots here (array)
+    #
+    # See your DB snapshots:
+    env.snapshots.select { |x| x.role == "db" }
 
 ## Debugging:
 

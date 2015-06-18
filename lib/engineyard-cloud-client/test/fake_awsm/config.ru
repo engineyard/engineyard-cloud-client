@@ -117,6 +117,63 @@ class FakeAwsm < Sinatra::Base
     render :rabl, :environments, :format => "json"
   end
 
+  post "/api/v2/environments/:env_id/add_instances" do
+    json({
+      "request" =>
+      {
+        "role" => "util",
+        "name" => "redis"
+      },
+      "instance" =>
+      {
+        "amazon_id" => nil,
+        "availability_zone" => nil,
+        "bootstrapped_at" => nil,
+        "chef_status" => nil,
+        "error_message" => nil,
+        "id" => 999999,
+        "name" => "redis",
+        "role" => "util",
+        "size" => "medium_cpu",
+        "status" => "starting",
+        "public_hostname" => nil,
+        "private_hostname" => nil
+      },
+      "status" => "accepted"
+    })
+  end
+
+  get "/api/v2/environments/:env_id/snapshots" do
+    json({
+      "snapshots" => {
+        "db" =>
+        [
+          {
+            "amazon_id" => "snap-100f178c",
+            "created_at" => "2015-06-16T09:58:04+00:00",
+            "size" => 15,
+            "arch" => 64
+          },
+          {
+            "amazon_id" => "snap-e87d7b74",
+            "created_at" => "2015-06-15T09:58:03+00:00",
+            "size" => 15,
+            "arch" => 64
+          }
+        ],
+        "web" =>
+        [
+          {
+            "amazon_id" => "snap-123abc",
+            "created_at" => "2015-06-14",
+            "size" => 15,
+            "arch" => 64
+          }
+        ]
+      }
+    })
+  end
+
   get "/api/v2/environments/resolve" do
     @resolver = EY::Resolver.environment_resolver(@user, params['constraints'])
     render :rabl, :resolve_environments, :format => "json"

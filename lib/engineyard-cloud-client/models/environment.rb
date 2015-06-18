@@ -5,6 +5,7 @@ require 'engineyard-cloud-client/models/app_environment'
 require 'engineyard-cloud-client/models/instance'
 require 'engineyard-cloud-client/models/log'
 require 'engineyard-cloud-client/models/recipes'
+require 'engineyard-cloud-client/models/snapshot'
 require 'engineyard-cloud-client/resolver_result'
 require 'engineyard-cloud-client/errors'
 
@@ -136,7 +137,21 @@ module EY
       def account_name
         account && account.name
       end
-
+      
+      def snapshots
+        @snapshots ||= request_snapshots
+      end
+      
+      def utility_snapshots(name = nil)
+        snapshots.select do |snapshot|
+          snapshot.role == 'utility' && snapshot.name == name
+        end
+      end
+      
+      def newest_utility_snapshot(name = nil)
+        utility_snapshots(name).first
+      end
+      
       def hierarchy_name
         [account_name, name].join(" / ")
       end
@@ -262,6 +277,16 @@ module EY
       #
       # Note also that if you add a util instance, you *must* specify a
       # name. This method will raise if you don't.
+      #
+      # Instance sizes are documented at
+      # https://support.cloud.engineyard.com/hc/en-us/articles/205413998-Add-an-Instance
+      #
+      # List:
+      #   small, small_64, medium_ram, medium_ram_64, medium_cpu, medium_cpu_64,
+      #   large, xlarge, xlarge_cpu, xlarge_ram, doublexlarge_ram,
+      #   quadxlarge_ram, quadxlarge_io.
+
+
       def add_instance(opts)
         unless %w[app util].include?(opts[:role].to_s)
           # Fail immediately because we don't have valid arguments.
@@ -278,13 +303,14 @@ module EY
             raise InvalidInstanceName, "When specifying a util instance you must also specify a name."
           end
         end
+        
+        request = { "role" => opts[:role], "name" => opts[:name] }
+        request['snapshot_id'] = opts[:snapshot_id] if opts.key?(:snapshot_id)
+        request['instance_size'] = opts[:instance_size] if opts.key?(:instance_size)
 
         # We know opts[:role] is right, name can be passed straight to the API.
         # Return the response body for error output, logging, etc.
-        return api.post("/environments/#{id}/add_instances", :request => {
-          "role" => opts[:role],
-          "name" => opts[:name]
-        })
+        return api.post("/environments/#{id}/add_instances", :request => request)
       end
 
       #
@@ -405,6 +431,10 @@ module EY
 
       def load_instances(instances_attrs)
         Instance.from_array(api, instances_attrs, 'environment' => self).sort
+      end
+      
+      def request_snapshots
+        Snapshot.all(api, self)
       end
 
       def sort_attributes

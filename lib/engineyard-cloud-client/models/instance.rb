@@ -6,6 +6,13 @@ module EY
       alias hostname public_hostname
       alias bridge? bridge
 
+      # Returns known valid instance sizes.
+      # List obtained from
+      # https://support.cloud.engineyard.com/hc/en-us/articles/205413998-Add-an-Instance
+      def self.valid_sizes
+        %w{small, small_64, medium_ram, medium_ram_64, medium_cpu, medium_cpu_64, large, xlarge, xlarge_cpu, xlarge_ram, doublexlarge_ram, quadxlarge_ram, quadxlarge_io}
+      end
+
       def has_app_code?
         !["db_master", "db_slave"].include?(role.to_s)
       end

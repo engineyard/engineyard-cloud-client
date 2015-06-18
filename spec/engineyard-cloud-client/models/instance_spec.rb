@@ -2,6 +2,12 @@ require 'spec_helper'
 
 describe EY::CloudClient::Instance do
 
+  describe "self.valid_sizes" do
+    it "returns a list of known valid sizes for instances" do
+      expect(EY::CloudClient::Instance.valid_sizes).not_to be_nil
+    end
+  end
+
   describe "#bridge?" do
     it "is true when bridge is true" do
       expect(EY::CloudClient::Instance.from_hash(cloud_client, "bridge" => true, "role" => "app")).to be_bridge

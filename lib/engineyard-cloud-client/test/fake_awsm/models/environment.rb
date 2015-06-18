@@ -14,6 +14,7 @@ class Environment
   has n, :app_environments
   has n, :apps, :through => :app_environments
   has n, :instances
+  has n, :snapshots
 
   def inspect
     "#<Environment name:#{name} account:#{account.name}>"
