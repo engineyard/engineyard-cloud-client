@@ -12,9 +12,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 # Bundled gems
-require 'fakeweb'
-require 'fakeweb_matcher'
-
+require 'webmock/rspec'
 require 'multi_json'
 
 # Engineyard gem
@@ -41,7 +39,7 @@ RSpec.configure do |config|
   config.include SpecHelpers
 
   config.before(:all) do
-    FakeWeb.allow_net_connect = false
+    WebMock.disable_net_connect!
   end
 
 end

@@ -35,8 +35,8 @@ describe EY::CloudClient::Environment do
         ]
       }
 
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true",
-        :body => MultiJson.dump(response), :content_type => "application/json")
+      stub_request(:get, "https://cloud.engineyard.com/api/v2/environments?no_instances=true").
+        to_return(body: MultiJson.dump(response), headers: { content_type: "application/json" })
 
       environments = EY::CloudClient::Environment.all(cloud_client)
 
@@ -79,8 +79,8 @@ describe EY::CloudClient::Environment do
            "id"=>30573,
            "instance_status"=>"none"}}
 
-      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
-        :body => MultiJson.dump(response), :content_type => "application/json")
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments").
+        to_return(body: MultiJson.dump(response), headers: { content_type: "application/json" })
 
       env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
@@ -88,7 +88,7 @@ describe EY::CloudClient::Environment do
         "app_server_stack_name" => 'nginx_thin',
         "region"                => 'us-west-1'
       })
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
 
       expect(env.name).to eq("myapp_production")
       expect(env.account.name).to eq("myaccount")
@@ -142,8 +142,8 @@ describe EY::CloudClient::Environment do
            "id"=>30573,
            "instance_status"=>"starting"}}
 
-      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments",
-        :body => MultiJson.dump(response), :content_type => "application/json")
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments").
+        to_return(body: MultiJson.dump(response), headers: { content_type: "application/json" })
 
       env = EY::CloudClient::Environment.create(cloud_client, {
         "app"                   => app,
@@ -154,7 +154,7 @@ describe EY::CloudClient::Environment do
           "configuration" => "solo"
         }
       })
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/apps/12345/environments")
 
       expect(env.name).to eq("myapp_production")
       expect(env.instances.count).to eq(1)
@@ -166,15 +166,12 @@ describe EY::CloudClient::Environment do
     it "hits the rebuild action in the API" do
       env = EY::CloudClient::Environment.from_hash(cloud_client, { "id" => 46534 })
 
-      FakeWeb.register_uri(
-        :put,
-        "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances",
-        :body => ''
-      )
+      stub_request(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances").
+        to_return(body: "")
 
       env.rebuild
 
-      expect(FakeWeb).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances")
+      expect(WebMock).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/update_instances")
     end
   end
 
@@ -182,16 +179,12 @@ describe EY::CloudClient::Environment do
     it "hits the rebuild action in the API" do
       env = EY::CloudClient::Environment.from_hash(cloud_client, { "id" => 46534 })
 
-      FakeWeb.register_uri(
-        :put,
-        "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes",
-        :body => '',
-        :content_type => 'application/json'
-      )
+      stub_request(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes").
+        to_return(body: "", headers: { content_type: "application/json" })
 
       env.run_custom_recipes
 
-      expect(FakeWeb).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes")
+      expect(WebMock).to have_requested(:put, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/run_custom_recipes")
     end
   end
 
@@ -210,11 +203,8 @@ describe EY::CloudClient::Environment do
         "instances" => [instance_data],
       })
 
-      FakeWeb.register_uri(:get,
-        "https://cloud.engineyard.com/api/v2/environments/#{env.id}/instances",
-        :body => MultiJson.dump({"instances" => [instance_data]}),
-        :content_type => 'application/json'
-      )
+      stub_request(:get, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/instances").
+        to_return(body: MultiJson.dump({"instances" => [instance_data]}), headers: { content_type: "application/json" })
 
       expect(env.instances.size).to eq(1)
       expect(env.instances.first).to eq(EY::CloudClient::Instance.from_hash(cloud_client, instance_data.merge('environment' => env)))
@@ -328,16 +318,15 @@ describe EY::CloudClient::Environment do
         'instances_count' => 4,
       })
 
-      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances",
-        :content_type => "application/json",
-        :body => MultiJson.dump({
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances").
+        to_return(body: MultiJson.dump({
           "request"  => {"provisioned_id"=>"i-xxxxxx", "role"=>"app"},
           "instance" => {"amazon_id"=>"i-xxxxxxx", "id"=>12345, "role"=>"app", "status"=>"running"},
           "status"=>"accepted"
-        }))
+        }), headers: { content_type: "application/json" })
 
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
-        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
+      stub_request(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?").
+        to_return(body: MultiJson.dump('instances' => @instances_response), headers: { content_type: "application/json" })
     end
 
     after do
@@ -349,7 +338,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i) # db_master, should fail
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(WebMock).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "raises an error if the instance isn't provisioned yet" do
@@ -357,7 +346,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i) # app, but not provisioned and no amazon id
       }.to raise_error EY::CloudClient::InstanceNotProvisioned
-      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(WebMock).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "sends an API request when things check out" do
@@ -365,7 +354,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i)
       }.to_not raise_error
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "does the same thing when Instance#remove helper method is used instead" do
@@ -373,15 +362,15 @@ describe EY::CloudClient::Environment do
       expect {
         i.remove
       }.to_not raise_error
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
 
     it "reloads the instances after a remove request" do
       @env.instance_by_id(55555).remove
       @instances_response.pop
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?",
-        :content_type => "application/json", :body => MultiJson.dump('instances' => @instances_response))
-      expect(FakeWeb).to have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
+      stub_request(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?").
+        to_return(body: MultiJson.dump('instances' => @instances_response), headers: { content_type: "application/json" })
+      expect(WebMock).to have_requested(:get, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/instances?")
     end
 
     it "removes a util instance when name is supplied" do
@@ -389,7 +378,7 @@ describe EY::CloudClient::Environment do
       expect {
         @env.remove_instance(i)
       }.to_not raise_error
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/remove_instances")
     end
   end
 
@@ -398,16 +387,15 @@ describe EY::CloudClient::Environment do
       @env = EY::CloudClient::Environment.from_hash(
         EY::CloudClient.new(:token => 't'), {'name' => 'fake', "id" => "123"} )
 
-      # Register the API endpoint with FakeWeb
-      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances",
-        :body => '{
-            "request"=>{"role"=>"app", "name"=>"foo"},
-            "instance"=>{
-              "id"=>257843, "name"=>nil,
-              "role"=>"app", "status"=>"starting"
-            },
-            "status"=>"accepted"}'
-      )
+      # Register the API endpoint with WebMock
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances").
+        to_return(body: '{
+          "request"=>{"role"=>"app", "name"=>"foo"},
+          "instance"=>{
+            "id"=>257843, "name"=>nil,
+            "role"=>"app", "status"=>"starting"
+          },
+          "status"=>"accepted"}')
     end
 
     after :all do
@@ -418,14 +406,14 @@ describe EY::CloudClient::Environment do
       expect {
         @env.add_instance(:name => 'foo')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(WebMock).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "will raise if role isn't either app or util" do
       expect {
         @env.add_instance(:role => 'fake')
       }.to raise_error EY::CloudClient::InvalidInstanceRole
-      expect(FakeWeb).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(WebMock).not_to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "will raise if you specify util, but not name" do
@@ -441,13 +429,15 @@ describe EY::CloudClient::Environment do
     end
 
     it "sends a POST request to the API" do
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/environments/123/add_instances")
       @env.add_instance(:role => "app")
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
 
     it "returns the API's response body" do
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/environments/123/add_instances")
       expect(@env.add_instance(:role => "util", :name => "blah")).not_to be_nil
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{@env.id}/add_instances")
     end
   end
 
