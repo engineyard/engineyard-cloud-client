@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency('rest-client', '~>2.0')
   s.add_dependency('multi_json', '~>1.6')
 
-  s.add_development_dependency('rspec', '~>2.0')
+  s.add_development_dependency('rspec', '~>3.7.0')
   s.add_development_dependency('rake')
   s.add_development_dependency('webmock')
   s.add_development_dependency('sinatra', '~>1.4.8')
