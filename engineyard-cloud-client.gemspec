@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.test_files = Dir.glob("spec/**/*")
 
-  s.required_ruby_version = '>= 2.4'
+  s.required_ruby_version = '>= 2.1'
 
   s.add_dependency('rest-client', '~>2.0')
   s.add_dependency('multi_json', '~>1.6')
@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rspec', '~>2.0')
   s.add_development_dependency('rake')
   s.add_development_dependency('webmock')
-  s.add_development_dependency('sinatra')
+  s.add_development_dependency('sinatra', '~>1.4.8')
   s.add_development_dependency('realweb', '~>1.0.1')
   s.add_development_dependency('ardm-core', '~> 1.2')
   s.add_development_dependency('ardm-migrations')
