@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EY::CloudClient::AppEnvironment do
   before(:each) do
-    FakeWeb.allow_net_connect = true
+    WebMock.allow_net_connect!
   end
 
   describe "deploying" do

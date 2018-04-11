@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EY::CloudClient::User do
   before do
-    FakeWeb.allow_net_connect = true
+    WebMock.allow_net_connect!
   end
 
   it "loads current user and returns all accounts" do

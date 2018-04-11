@@ -6,14 +6,14 @@ describe EY::CloudClient do
   end
 
   it "uses production EY Cloud by default" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :body => %|{"api_token": "cloudtoken"}|, :content_type => 'application/json')
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(body: %|{"api_token": "cloudtoken"}|, headers: { content_type: 'application/json' })
     client = EY::CloudClient.new
     client.authenticate!("a@b.com", "foo")
     expect(client.connection.token).to eq("cloudtoken")
   end
 
   it "uses a custom endpoint to make requests" do
-    FakeWeb.register_uri(:post, "http://fake.local/api/v2/authenticate", :body => %|{"api_token": "fake.localtoken"}|, :content_type => 'application/json')
+    stub_request(:post, "http://fake.local/api/v2/authenticate").to_return(body: %|{"api_token": "fake.localtoken"}|, headers: { content_type: 'application/json' })
     client = EY::CloudClient.new(:endpoint => "http://fake.local/")
     client.authenticate!("a@b.com", "foo")
     expect(client.connection.token).to eq("fake.localtoken")
@@ -24,7 +24,7 @@ describe EY::CloudClient do
   end
 
   it "raises InvalidCredentials when the credentials are invalid" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 401, :content_type => 'application/json')
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(status: 401, headers: { content_type: 'application/json' })
 
     expect {
       EY::CloudClient.new.authenticate!("a@b.com", "foo")
@@ -32,7 +32,7 @@ describe EY::CloudClient do
   end
 
   it "raises RequestFailed with a friendly error when cloud is under maintenance" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 502, :content_type => 'text/html')
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(status: 502, headers: { content_type: 'text/html' })
 
     expect {
       EY::CloudClient.new.authenticate!("a@b.com", "foo")
@@ -40,7 +40,7 @@ describe EY::CloudClient do
   end
 
   it "raises RequestFailed with a friendly error when the response contains a message in json" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 409, :content_type => 'application/json', :body => %|{"message":"Important information regarding your failure"}|)
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(status: 409, body: %|{"message":"Important information regarding your failure"}|, headers: { content_type: 'application/json' })
 
     expect {
       EY::CloudClient.new.authenticate!("a@b.com", "foo")
@@ -48,7 +48,7 @@ describe EY::CloudClient do
   end
 
   it "raises RequestFailed with a semi-useful error message when the body is empty" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 409, :content_type => 'text/plain', :body => "")
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(status: 409, body: "", headers: { content_type: 'text/plain' })
 
     expect {
       EY::CloudClient.new.authenticate!("a@b.com", "foo")
@@ -56,7 +56,7 @@ describe EY::CloudClient do
   end
 
   it "raises RequestFailed with the response body when the content type is not json" do
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/authenticate", :status => 409, :content_type => 'text/plain', :body => "What a useful error message!")
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/authenticate").to_return(status: 409, body: "What a useful error message!", headers: { content_type: 'text/plain' })
 
     expect {
       EY::CloudClient.new.authenticate!("a@b.com", "foo")

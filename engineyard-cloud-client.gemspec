@@ -19,16 +19,15 @@ Gem::Specification.new do |s|
 
   s.test_files = Dir.glob("spec/**/*")
 
-  s.required_ruby_version = '>= 1.9.3'
+  s.required_ruby_version = '>= 2.1'
 
-  s.add_dependency('rest-client', '~>1.7')
+  s.add_dependency('rest-client', '~>2.0')
   s.add_dependency('multi_json', '~>1.6')
 
-  s.add_development_dependency('rspec', '~>2.0')
+  s.add_development_dependency('rspec', '~>3.7.0')
   s.add_development_dependency('rake')
-  s.add_development_dependency('fakeweb')
-  s.add_development_dependency('fakeweb-matcher')
-  s.add_development_dependency('sinatra')
+  s.add_development_dependency('webmock')
+  s.add_development_dependency('sinatra', '~>1.4.8')
   s.add_development_dependency('realweb', '~>1.0.1')
   s.add_development_dependency('ardm-core', '~> 1.2')
   s.add_development_dependency('ardm-migrations')

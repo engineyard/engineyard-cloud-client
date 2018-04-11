@@ -3,22 +3,22 @@ require "json"
 
 describe EY::CloudClient::Snapshot do
   before do
-    FakeWeb.allow_net_connect = true
+    WebMock.allow_net_connect!
   end
 
   it "lets you see an env's snapshots" do
     api = scenario_cloud_client "One App Many Envs"
-    
+
     # in fake_awsm/scenarios.rb we put snapshots on the "giblets" environment
     env = api.environment_by_name "giblets"
     expect(env.snapshots.size).to eq(3)
   end
 
   it "lets you boot an instance with a snapshot of the right role" do
-    # Mock output with FakeWeb and assert that the right endpoint got called.
-    FakeWeb.allow_net_connect = false
+    # Mock output with Webmock and assert that the right endpoint got called.
+    WebMock.disable_net_connect!
     mocked_response = {
-      "request" => 
+      "request" =>
       {
         "role" => "util",
         "name" => "redis"
@@ -42,9 +42,9 @@ describe EY::CloudClient::Snapshot do
     }
 
     env = EY::CloudClient::Environment.from_hash(cloud_client, {"id" => 12345})
-    FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/add_instances", :body => mocked_response.to_json)
+    stub_request(:post, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/add_instances").to_return(body: mocked_response.to_json)
     env.add_instance(:role => "app", :instance_size => "medium_cpu_64", :snapshot_id => "abc123")
-    expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/add_instances")    
+    expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/environments/#{env.id}/add_instances")
 
   end
 end

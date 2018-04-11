@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EY::CloudClient::Keypair do
   before do
-    FakeWeb.allow_net_connect = true
+    WebMock.allow_net_connect!
   end
 
   it "creates, finds, and destroys keypairs" do

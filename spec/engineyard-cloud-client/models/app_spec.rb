@@ -15,8 +15,8 @@ describe EY::CloudClient::App do
         ]
       }
 
-      FakeWeb.register_uri(:get, "https://cloud.engineyard.com/api/v2/apps?no_instances=true",
-        :body => MultiJson.dump(response), :content_type => "application/json")
+      stub_request(:get, "https://cloud.engineyard.com/api/v2/apps?no_instances=true").
+        to_return(body: MultiJson.dump(response), headers: { content_type: "application/json" })
 
       apps = EY::CloudClient::App.all(cloud_client)
 
@@ -39,8 +39,8 @@ describe EY::CloudClient::App do
         }
       }
 
-      FakeWeb.register_uri(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps",
-        :body => MultiJson.dump(response), :content_type => "application/json")
+      stub_request(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps").
+        to_return(body: MultiJson.dump(response), headers: { content_type: "application/json" })
 
       app = EY::CloudClient::App.create(cloud_client, {
         "account"        => account,
@@ -49,7 +49,7 @@ describe EY::CloudClient::App do
         "app_type_id"    => 'rails3'
       })
 
-      expect(FakeWeb).to have_requested(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps")
+      expect(WebMock).to have_requested(:post, "https://cloud.engineyard.com/api/v2/accounts/1234/apps")
 
       expect(app.name).to eq("myapp")
       expect(app.account.name).to eq("myaccount")
