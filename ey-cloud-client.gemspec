@@ -4,7 +4,7 @@ $:.unshift lib unless $:.include?(lib)
 require 'engineyard-cloud-client/version'
 
 Gem::Specification.new do |s|
-  s.name = "engineyard-cloud-client"
+  s.name = "ey-cloud-client"
   s.version = EY::CloudClient::VERSION
   s.platform = Gem::Platform::RUBY
   s.author = "EY Cloud Team"
