@@ -4,14 +4,13 @@ engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API
 
 [![Build Status](https://travis-ci.org/engineyard/engineyard-cloud-client.svg?branch=master)](https://travis-ci.org/rest-client/rest-client)
 
-## Version 2.0.x
+## Version 3.0.x
 
-As of the 2.0 version series, we will only be supporting ruby versions 1.9.3 and
-greater. Supporting older versions of ruby has gotten increasingly difficult as
-more and more gems assume that everyone is using 1.9.3 or greater.
+As of the 3.0 version series, we will only be supporting ruby versions 2.1 and
+greater.
 
-The 1.0 version series will no longer be under active development, but will
-remain available through rubygems and on the 1-0-stable branch.
+The 1.0 and 2.1 versions series will no longer be under active development, but will
+remain available through rubygems and on the 1-0-stable 2-1-stable branches.
 
 ## Use at your own risk
 
@@ -153,17 +152,17 @@ Instances:
 
     #
     # add an instance
-    # IMPORTANT: See comments in code at 
+    # IMPORTANT: See comments in code at
     # lib/engineyard-cloud-client/models/environment.rb#add_instance(opts)
     # caveats may apply now and/or in the future
-    # 
+    #
     api = EY::CloudClient.new(token: 'my token')
     env = api.environment_by_name("myenv")
 
     env.add_instance(role: "app") # adds app instance to cluster
     env.add_instance(role: "util", name: "sphinx") # adds util named "sphinx"
 
-    # 
+    #
     # remove an instance
     # IMPORTANT: See comments in code at
     # lib/engineyard-cloud-client/models/environment.rb#remove_instance(instance)
