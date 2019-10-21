@@ -1,5 +1,8 @@
 # Engine Yard Cloud Client
 
+#### This gem is deprecated - The repository is kept for historical purposes only.
+#### Please use [core-client-rb](https://github.com/engineyard/core-client-rb) for any cli/automation work against the [Engine Yard API](https://developer.engineyard.com)
+
 engineyard-cloud-client contains a Ruby api library to the Engine Yard Cloud API. Extracted from the [engineyard gem](https://github.com/engineyard/engineyard).
 
 [![Build Status](https://travis-ci.org/engineyard/engineyard-cloud-client.svg?branch=master)](https://travis-ci.org/rest-client/rest-client)
